@@ -60,12 +60,6 @@ Partial Class FrmAnalizar
         TxtCargos = New TextBox()
         TxtAbonos = New TextBox()
         OpenFileDialog1 = New OpenFileDialog()
-        Fecha = New DataGridViewTextBoxColumn()
-        Numeor = New DataGridViewTextBoxColumn()
-        TipoPoliza = New DataGridViewTextBoxColumn()
-        Registros = New DataGridViewTextBoxColumn()
-        Cargos = New DataGridViewTextBoxColumn()
-        Abonos = New DataGridViewTextBoxColumn()
         TableLayoutPanel1.SuspendLayout()
         ToolStrip1.SuspendLayout()
         CType(MiDataGrid, ComponentModel.ISupportInitialize).BeginInit()
@@ -228,7 +222,6 @@ Partial Class FrmAnalizar
         DataGridViewCellStyle2.WrapMode = DataGridViewTriState.True
         MiDataGrid.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle2
         MiDataGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        MiDataGrid.Columns.AddRange(New DataGridViewColumn() {Fecha, Numeor, TipoPoliza, Registros, Cargos, Abonos})
         MiDataGrid.ContextMenuStrip = ContextMenuStrip1
         MiDataGrid.Dock = DockStyle.Fill
         MiDataGrid.Location = New Point(3, 58)
@@ -370,43 +363,6 @@ Partial Class FrmAnalizar
         OpenFileDialog1.FileName = "OpenFileDialog1"
         OpenFileDialog1.Filter = "Archivos de Excel (*.xls)|*.xlsx|Todos los archivos (*.*)|*.*"
         ' 
-        ' Fecha
-        ' 
-        Fecha.HeaderText = "Fecha"
-        Fecha.Name = "Fecha"
-        Fecha.ReadOnly = True
-        ' 
-        ' Numeor
-        ' 
-        Numeor.HeaderText = "Número"
-        Numeor.Name = "Numeor"
-        Numeor.ReadOnly = True
-        ' 
-        ' TipoPoliza
-        ' 
-        TipoPoliza.HeaderText = "Tipo de póliza"
-        TipoPoliza.Name = "TipoPoliza"
-        TipoPoliza.ReadOnly = True
-        TipoPoliza.Width = 200
-        ' 
-        ' Registros
-        ' 
-        Registros.HeaderText = "Registros"
-        Registros.Name = "Registros"
-        Registros.ReadOnly = True
-        ' 
-        ' Cargos
-        ' 
-        Cargos.HeaderText = "Cargos"
-        Cargos.Name = "Cargos"
-        Cargos.ReadOnly = True
-        ' 
-        ' Abonos
-        ' 
-        Abonos.HeaderText = "Abonos"
-        Abonos.Name = "Abonos"
-        Abonos.ReadOnly = True
-        ' 
         ' FrmAnalizar
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
@@ -462,10 +418,4 @@ Partial Class FrmAnalizar
     Friend WithEvents ToolStripLabel2 As ToolStripLabel
     Friend WithEvents LblSeleccion As ToolStripTextBox
     Friend WithEvents ToolStripLabel1 As ToolStripLabel
-    Friend WithEvents Fecha As DataGridViewTextBoxColumn
-    Friend WithEvents Numeor As DataGridViewTextBoxColumn
-    Friend WithEvents TipoPoliza As DataGridViewTextBoxColumn
-    Friend WithEvents Registros As DataGridViewTextBoxColumn
-    Friend WithEvents Cargos As DataGridViewTextBoxColumn
-    Friend WithEvents Abonos As DataGridViewTextBoxColumn
 End Class

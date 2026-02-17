@@ -8,6 +8,10 @@ Public Class FrmImportarDatos
     Private WithEvents MiDatosContPaqBS As BindingSource
     Dim MyIndex As Integer
 
+    Private empleadosDict As Dictionary(Of Integer, Integer)
+    Private tipoPolizaDict As Dictionary(Of String, Integer)
+    Private rubrosDict As Dictionary(Of String, String)
+
     Private Sub FrmImportarDatos_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         TxtNombreArchivo.Text = "ninguno"
         LblSeleccion.Text = "0"
@@ -25,8 +29,9 @@ Public Class FrmImportarDatos
 
         ' Configurar BackgroundWorker
         If BackgroundWorker1 Is Nothing Then
-            BackgroundWorker1 = New System.ComponentModel.BackgroundWorker()
-            BackgroundWorker1.WorkerReportsProgress = True
+            BackgroundWorker1 = New ComponentModel.BackgroundWorker With {
+                .WorkerReportsProgress = True
+            }
         End If
     End Sub
 
@@ -73,9 +78,9 @@ Public Class FrmImportarDatos
             MiDataGrid.Columns(1).HeaderText = "Tipo de trabajador"
             MiDataGrid.Columns(4).HeaderText = "Tipo de póliza"
             MiDataGrid.Columns(2).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill  'Nombre
-            MiDataGrid.Columns(10).Visible = False  'idEmpleado
-            MiDataGrid.Columns(11).Visible = False 'idTipoPoliza
-            MiDataGrid.Columns(12).Visible = False 'ClaveRubro
+            'MiDataGrid.Columns(10).Visible = False  'idEmpleado
+            'MiDataGrid.Columns(11).Visible = False 'idTipoPoliza
+            'MiDataGrid.Columns(12).Visible = False 'ClaveRubro
         End If
 
         AddHandler MiDatosContPaqBS.PositionChanged, AddressOf MiDatosContPaqBS_PositionChanged
@@ -83,7 +88,6 @@ Public Class FrmImportarDatos
         BtnActualizar.Enabled = MiDatosContPaqBS.Count > 0
         MiDatosContPaqBS_PositionChanged(Nothing, Nothing)
         SumarCargosYAbonos()
-        MiBuscarIndices()
         MiDatosContPaqBS.Sort = "Fecha ASC, Numero ASC, TipoPoliza ASC, Nombre ASC"
     End Sub
 
@@ -96,91 +100,114 @@ Public Class FrmImportarDatos
         BtnUltimo.Enabled = MiDatosContPaqBS.Position < MiDatosContPaqBS.Count - 1
     End Sub
 
-    Private Sub MiBuscarIndices()
+    Private Sub MiCargarDiccionarios()
         Dim sqlConexion As New MySqlConnection("allowuservariables=True; server=localhost; User Id=buzosbyp_erp; password=Mientras12$; database=buzosbyp_erp")
-        Dim noCuentaCompaq As Integer = 0
-        Dim idEmpleado As Integer = 0
-        Dim TipoPoliza As String = ""
-        Dim idTipoPoliza As Integer = 0
+
+        'Dim noCuentaCompaq As Integer = 0
+        'Dim idEmpleado As Integer = 0
+        'Dim TipoPoliza As String = ""
+        'Dim idTipoPoliza As Integer = 0
         Dim empleadosDA, tipoPolizaDA, rubrosDA As MySqlDataAdapter
         Dim empleadosDT, tipoPolizaDT, rubrosDT As New System.Data.DataTable
-        Dim empleadosBS, tipoPolizaBS, rubrosBS As BindingSource
-        Dim rowSocios, rowTipoPoliza, rowRubros As DataRowView
+        'Dim empleadosBS, tipoPolizaBS, rubrosBS As BindingSource
+        'Dim rowSocios, rowTipoPoliza, rowRubros As DataRowView
+
+        empleadosDict = New Dictionary(Of Integer, Integer)
+        tipoPolizaDict = New Dictionary(Of String, Integer)
+        rubrosDict = New Dictionary(Of String, String)
+
 
         Try
             sqlConexion.Open()
 
-            empleadosDA = New MySqlDataAdapter("SELECT idEmpleado, TipoEmpleado, noCuenta, CONCAT(ApPaterno, ' ', ApMaterno, ' ', Nombre) AS Nombre FROM empleados", sqlConexion)
+            empleadosDA = New MySqlDataAdapter("SELECT idEmpleado, noCuenta FROM empleados", sqlConexion)
+            'empleadosDA = New MySqlDataAdapter("SELECT idEmpleado, TipoEmpleado, noCuenta, CONCAT(ApPaterno, ' ', ApMaterno, ' ', Nombre) AS Nombre FROM empleados", sqlConexion)
             empleadosDA.Fill(empleadosDT)
-            empleadosBS = New BindingSource With {.DataSource = empleadosDT}
-            If empleadosBS.Count > 0 Then
-                MiDatosContPaqBS.Sort = "Nombre ASC"
-                For Each rowCompaq As DataRowView In MiDatosContPaqBS
-                    If noCuentaCompaq <> rowCompaq.Row.Item("Cuenta") Then
-                        noCuentaCompaq = rowCompaq.Row.Item("Cuenta")
-                        MyIndex = empleadosBS.Find("noCuenta", noCuentaCompaq)
-                        If MyIndex >= 0 Then
-                            empleadosBS.Position = MyIndex
-                            rowSocios = empleadosBS.Current
-                            idEmpleado = rowSocios("idEmpleado")
-                        Else
-                            idEmpleado = 0
-                        End If
-                    End If
-                    rowCompaq.Row.Item("idEmpleado") = idEmpleado
-                Next
-            Else
-                MsgBox("Error, no se pudo cargar la tabla de empleados, del programa de socios...")
-            End If
+            'empleadosBS = New BindingSource With {.DataSource = empleadosDT}
+            'If empleadosBS.Count > 0 Then
+            'MiDatosContPaqBS.Sort = "Nombre ASC"
+            'For Each rowCompaq As DataRowView In MiDatosContPaqBS
+            'If noCuentaCompaq <> rowCompaq.Row.Item("Cuenta") Then
+            'noCuentaCompaq = rowCompaq.Row.Item("Cuenta")
+            'MyIndex = empleadosBS.Find("noCuenta", noCuentaCompaq)
+            'If MyIndex >= 0 Then
+            'empleadosBS.Position = MyIndex
+            'rowSocios = empleadosBS.Current
+            'idEmpleado = rowSocios("idEmpleado")
+            'Else
+            'idEmpleado = 0
+            'End If
+            'End If
+            'rowCompaq.Row.Item("idEmpleado") = idEmpleado
+            'Next
+            'Else
+            'MsgBox("Error, no se pudo cargar la tabla de empleados, del programa de socios...")
+            'End If
+            For Each row As DataRow In empleadosDT.Rows
+                empleadosDict(Convert.ToInt32(row("noCuenta"))) = Convert.ToInt32(row("idEmpleado"))
+            Next
 
-            tipoPolizaDA = New MySqlDataAdapter("SELECT * FROM ctg_tipopoliza", sqlConexion)
+            tipoPolizaDA = New MySqlDataAdapter("SELECT idTipoPoliza, TipoPoliza FROM ctg_tipopoliza", sqlConexion)
             tipoPolizaDA.Fill(tipoPolizaDT)
-            tipoPolizaBS = New BindingSource With {.DataSource = tipoPolizaDT}
-            If tipoPolizaBS.Count > 0 Then
-                MiDatosContPaqBS.Sort = "TipoPoliza ASC"
-                For Each rowCompaq As DataRowView In MiDatosContPaqBS
-                    If TipoPoliza <> rowCompaq.Row.Item("TipoPoliza") Then
-                        TipoPoliza = rowCompaq.Row.Item("TipoPoliza")
-                        MyIndex = tipoPolizaBS.Find("TipoPoliza", TipoPoliza)
-                        If MyIndex >= 0 Then
-                            tipoPolizaBS.Position = MyIndex
-                            rowTipoPoliza = tipoPolizaBS.Current
-                            idTipoPoliza = rowTipoPoliza("idTipoPoliza")
-                        Else
-                            idTipoPoliza = 0
-                        End If
-                    End If
-                    rowCompaq.Row.Item("idTipoPoliza") = idTipoPoliza
-                Next
-            Else
-                MsgBox("Error, no se pudo cargar la tabla del catálogo de pólizas, del programa de socios...")
-            End If
+            'tipoPolizaBS = New BindingSource With {.DataSource = tipoPolizaDT}
+            'If tipoPolizaBS.Count > 0 Then
+            'MiDatosContPaqBS.Sort = "TipoPoliza ASC"
+            'For Each rowCompaq As DataRowView In MiDatosContPaqBS
+            'If TipoPoliza <> rowCompaq.Row.Item("TipoPoliza") Then
+            'TipoPoliza = rowCompaq.Row.Item("TipoPoliza")
+            'MyIndex = tipoPolizaBS.Find("TipoPoliza", TipoPoliza)
+            'If MyIndex >= 0 Then
+            'tipoPolizaBS.Position = MyIndex
+            'rowTipoPoliza = tipoPolizaBS.Current
+            'idTipoPoliza = rowTipoPoliza("idTipoPoliza")
+            'Else
+            'idTipoPoliza = 0
+            'End If
+            'End If
+            'rowCompaq.Row.Item("idTipoPoliza") = idTipoPoliza
+            'Next
+            'Else
+            'MsgBox("Error, no se pudo cargar la tabla del catálogo de pólizas, del programa de socios...")
+            'End If
+            For Each row As DataRow In tipoPolizaDT.Rows
+                tipoPolizaDict(row("TipoPoliza").ToString()) = Convert.ToInt32(row("idTipoPoliza"))
+            Next
 
-            rubrosDA = New MySqlDataAdapter("SELECT * FROM ctg_rubros", sqlConexion)
+            rubrosDA = New MySqlDataAdapter("SELECT Clave, Rubro FROM ctg_rubros", sqlConexion)
             rubrosDA.Fill(rubrosDT)
-            rubrosBS = New BindingSource With {.DataSource = rubrosDT}
-            If rubrosBS.Count > 0 Then
-                MiDatosContPaqBS.Sort = "Referencia ASC"
-                For Each rowCompaq As DataRowView In MiDatosContPaqBS
-                    MyIndex = rubrosBS.Find("Clave", rowCompaq.Row.Item("Referencia"))
-                    If MyIndex >= 0 Then
-                        rubrosBS.Position = MyIndex
-                        rowRubros = rubrosBS.Current
-                        rowCompaq.Row.Item("ClaveRubro") = rowRubros("Clave")
-                    Else
-                        MyIndex = rubrosBS.Find("Rubro", rowCompaq.Row.Item("Referencia"))
-                        If MyIndex >= 0 Then
-                            rubrosBS.Position = MyIndex
-                            rowRubros = rubrosBS.Current
-                            rowCompaq.Row.Item("ClaveRubro") = rowRubros("Clave")
-                        Else
-                            rowCompaq.Row.Item("ClaveRubro") = ""
-                        End If
-                    End If
-                Next
-            Else
-                MsgBox("Error, no se pudo cargar la tabla del catálogo de rubros, del programa de socios...")
-            End If
+            'rubrosBS = New BindingSource With {.DataSource = rubrosDT}
+            'If rubrosBS.Count > 0 Then
+            'MiDatosContPaqBS.Sort = "Referencia ASC"
+            'For Each rowCompaq As DataRowView In MiDatosContPaqBS
+            'MyIndex = rubrosBS.Find("Clave", rowCompaq.Row.Item("Referencia"))
+            'If MyIndex >= 0 Then
+            'rubrosBS.Position = MyIndex
+            'rowRubros = rubrosBS.Current
+            'rowCompaq.Row.Item("ClaveRubro") = rowRubros("Clave")
+            'Else
+            'MyIndex = rubrosBS.Find("Rubro", rowCompaq.Row.Item("Referencia"))
+            'If MyIndex >= 0 Then
+            'rubrosBS.Position = MyIndex
+            'rowRubros = rubrosBS.Current
+            'rowCompaq.Row.Item("ClaveRubro") = rowRubros("Clave")
+            'Else
+            'rowCompaq.Row.Item("ClaveRubro") = ""
+            'End If
+            'End If
+            'Next
+            'Else
+            'MsgBox("Error, no se pudo cargar la tabla del catálogo de rubros, del programa de socios...")
+            'End If
+            For Each row As DataRow In rubrosDT.Rows
+                Dim clave As String = row("Clave").ToString()
+                Dim rubro As String = row("Rubro").ToString()
+                If Not rubrosDict.ContainsKey(clave) Then
+                    rubrosDict(clave) = clave
+                End If
+                If Not rubrosDict.ContainsKey(rubro) Then
+                    rubrosDict(rubro) = clave
+                End If
+            Next
 
         Catch ex As MySqlException
             MsgBox("Error al intentar buscar los índices de los empleados: " & ex.Message)
@@ -212,70 +239,43 @@ Public Class FrmImportarDatos
         Dim excelApp As Application = Nothing
         Dim excelWorkBook As Workbook = Nothing
         Dim excelWorkSheet As Worksheet = Nothing
-        'Dim diagnostico As New System.Text.StringBuilder()
+
+        MiCargarDiccionarios() ' Cargar los diccionarios antes de procesar el archivo de Excel para mejorar el rendimiento
 
         Try
-            'diagnostico.AppendLine("=== INICIO DEL PROCESO (CON ARRAY OPTIMIZADO) ===")
-            ' Obtener la ruta del archivo de forma segura
             Dim miruta As String = ""
             Me.Invoke(Sub() miruta = OpenFileDialog1.FileName)
-            'diagnostico.AppendLine($"Archivo seleccionado: {miruta}")
-
             ' Verificar que el archivo existe
             If String.IsNullOrEmpty(miruta) OrElse Not System.IO.File.Exists(miruta) Then
-                'diagnostico.AppendLine("ERROR: El archivo no existe o la ruta está vacía")
                 Throw New System.IO.FileNotFoundException("El archivo no existe: " & miruta)
             End If
 
-            'diagnostico.AppendLine("Archivo existe - OK")
-
-            ' Inicializar Excel - SOLO configuraciones básicas
-            'diagnostico.AppendLine("Inicializando aplicación Excel...")
-            excelApp = New Application
-            excelApp.ScreenUpdating = False
-            excelApp.DisplayAlerts = False
-            excelApp.EnableEvents = False
-            'diagnostico.AppendLine("Aplicación Excel inicializada - OK")
-
-            ' Abrir el libro PRIMERO
-            'diagnostico.AppendLine("Abriendo libro de Excel...")
+            excelApp = New Application With {.ScreenUpdating = False, .DisplayAlerts = False, .EnableEvents = False}
             excelWorkBook = excelApp.Workbooks.Open(miruta)
-            'diagnostico.AppendLine("Libro abierto - OK")
-
-            ' AHORA sí configurar Calculation después de abrir el libro
-            'diagnostico.AppendLine("Configurando cálculo manual...")
-            Try
-                excelApp.Calculation = XlCalculation.xlCalculationManual
-                'diagnostico.AppendLine("Cálculo manual configurado - OK")
-            Catch calcEx As Exception
-                'diagnostico.AppendLine($"Advertencia: No se pudo configurar cálculo manual: {calcEx.Message}")
-            End Try
+            excelApp.Calculation = XlCalculation.xlCalculationManual
 
             ' Obtener la hoja de trabajo
-            'diagnostico.AppendLine("Obteniendo primera hoja de trabajo...")
             excelWorkSheet = excelWorkBook.Worksheets(1)
-            'diagnostico.AppendLine($"Hoja obtenida: {excelWorkSheet.Name}")
 
             ' Obtener el rango usado y cargarlo en array - AQUÍ ESTÁ LA OPTIMIZACIÓN
-            'diagnostico.AppendLine("Cargando datos en array...")
             Dim usedRange = excelWorkSheet.UsedRange
             If usedRange Is Nothing Then
-                'diagnostico.AppendLine("ERROR: UsedRange es Nothing")
                 Throw New Exception("No hay datos en la hoja de Excel")
             End If
 
             Dim totalRows As Integer = usedRange.Rows.Count
             Dim totalCols As Integer = usedRange.Columns.Count
-            'diagnostico.AppendLine($"Rango usado - Filas: {totalRows}, Columnas: {totalCols}")
+
+            If totalCols <> 8 Then
+                Throw New Exception("El número de columnas en la hoja de Excel no es el esperado: " & totalCols)
+            End If
 
             If totalRows = 0 Then
-                'diagnostico.AppendLine("ERROR: No hay filas con datos")
                 Throw New Exception("No hay datos en la hoja de Excel")
             End If
 
             ' CARGAR TODO EL RANGO EN UN ARRAY DE UNA SOLA VEZ
             Dim dataArray As Object(,) = usedRange.Value
-            'diagnostico.AppendLine($"Array cargado con éxito: {dataArray.GetUpperBound(0)} x {dataArray.GetUpperBound(1)}")
 
             ' Liberar el rango usado inmediatamente
             Marshal.ReleaseComObject(usedRange)
@@ -296,14 +296,10 @@ Public Class FrmImportarDatos
             MiDatosContPaqDT.Columns.Add("idEmpleado", GetType(Integer))
             MiDatosContPaqDT.Columns.Add("idTipoPoliza", GetType(Integer))
             MiDatosContPaqDT.Columns.Add("ClaveRubro")
-            'diagnostico.AppendLine("DataTable creado - OK")
 
-            ' Variables para el procesamiento
             Dim miCuenta, miNombre, miTipoTrabajador As String
             Dim miBanderaCuenta As Boolean = False
-            'Dim MyCargo, MyAbono As Double
             Dim miCelda As String
-            Dim registrosProcesados As Integer = 0
 
             x = 0
             y = totalRows
@@ -311,22 +307,10 @@ Public Class FrmImportarDatos
             miNombre = ""
             miTipoTrabajador = ""
 
-            'diagnostico.AppendLine($"Iniciando procesamiento del array de {totalRows} filas...")
-
-            ' PROCESAR EL ARRAY EN MEMORIA - MUCHO MÁS RÁPIDO
             For i = 1 To totalRows
-                'Try
                 If i Mod 1000 = 0 Then
                     BackgroundWorker1.ReportProgress(CInt((i * 100) / totalRows))
                 End If
-
-                ' Leer la primera celda del array
-                'miCelda = ""
-                'If i <= dataArray.GetUpperBound(0) AndAlso 1 <= dataArray.GetUpperBound(1) Then
-                'If dataArray(i, 1) IsNot Nothing Then
-                'miCelda = dataArray(i, 1).ToString().Trim()
-                'End If
-                'End If
                 miCelda = If(dataArray(i, 1) IsNot Nothing, dataArray(i, 1).ToString().Trim(), "")
 
                 If String.IsNullOrEmpty(miCelda) Then
@@ -334,128 +318,72 @@ Public Class FrmImportarDatos
                     Continue For
                 End If
 
-                ' Identificar línea de cuenta
                 If miCelda.Length = 17 Then
-                    'Try
                     miCuenta = miCelda.Substring(10, 3)
                     miTipoTrabajador = If(miCelda.Substring(4, 1).Trim() = "1", "SOCIO", "EXTRA")
-                    'miNombre = ""
-                    'If i <= dataArray.GetUpperBound(0) AndAlso 2 <= dataArray.GetUpperBound(1) Then
-                    'If dataArray(i, 2) IsNot Nothing Then
-                    'miNombre = dataArray(i, 2).ToString().Trim()
-                    'End If
-                    'End If
                     miNombre = If(dataArray(i, 2) IsNot Nothing, dataArray(i, 2).ToString().Trim(), "")
                     miBanderaCuenta = True
-                    'If i <= 5 Then ' Solo log para las primeras filas
-                    'diagnostico.AppendLine($"Cuenta encontrada en fila {i}: {miCuenta} - {miNombre}")
-                    'End If
-                    'Catch
-                    'miBanderaCuenta = False
-                    'End Try
                 ElseIf miBanderaCuenta AndAlso IsDate(miCelda) Then
-                    ' Procesar línea de datos
-                    'MyCargo = 0
-                    'MyAbono = 0
-                    'MyCargo = If(dataArray(i, 6) IsNot Nothing AndAlso IsNumeric(dataArray(i, 6)), CDbl(dataArray(i, 6)), 0)
-                    'MyAbono = If(dataArray(i, 7) IsNot Nothing AndAlso IsNumeric(dataArray(i, 7)), CDbl(dataArray(i, 7)), 0)
-                    ' Crear fila
+                    Dim tipoPoliza As String = If(dataArray(i, 2)?.ToString(), "")
+                    Dim referencia As String = If(dataArray(i, 5)?.ToString(), "")
+                    Dim cuentaInt As Integer = If(IsNumeric(miCuenta), Convert.ToInt32(miCuenta), 0)
+
                     Dim nuevaFila As DataRow = MiDatosContPaqDT.NewRow()
+
                     nuevaFila("Cuenta") = miCuenta
                     nuevaFila("Nombre") = miNombre
                     nuevaFila("TipoTrabajador") = miTipoTrabajador
-                    ' Fecha - CONTPAQi siempre genera fechas válidas
                     nuevaFila("Fecha") = If(dataArray(i, 1) IsNot Nothing, CDate(dataArray(i, 1)), DateTime.Now)
-                    ' Campos de texto - solo verificar Nothing
-                    nuevaFila("TipoPoliza") = If(dataArray(i, 2)?.ToString(), "")
+                    nuevaFila("TipoPoliza") = tipoPoliza
                     nuevaFila("Concepto") = If(dataArray(i, 4)?.ToString(), "")
-                    nuevaFila("Referencia") = If(dataArray(i, 5)?.ToString(), "")
-                    ' Numero - validar si es numérico
+                    nuevaFila("Referencia") = referencia
                     nuevaFila("Numero") = If(dataArray(i, 3) IsNot Nothing AndAlso IsNumeric(dataArray(i, 3)), CInt(dataArray(i, 3)), 0)
                     nuevaFila("Cargos") = If(dataArray(i, 6) IsNot Nothing AndAlso IsNumeric(dataArray(i, 6)), CDbl(dataArray(i, 6)), 0)
                     nuevaFila("Abonos") = If(dataArray(i, 7) IsNot Nothing AndAlso IsNumeric(dataArray(i, 7)), CDbl(dataArray(i, 7)), 0)
-                    nuevaFila("idEmpleado") = 0
-                    nuevaFila("idTipoPoliza") = 0
-                    nuevaFila("ClaveRubro") = ""
+                    'nuevaFila("idEmpleado") = If(empleadosDict.ContainsKey(Convert.ToInt32(miCuenta)), empleadosDict(Convert.ToInt32(miCuenta)), 0)
+                    nuevaFila("idEmpleado") = If(empleadosDict.ContainsKey(cuentaInt), empleadosDict(cuentaInt), 0)
+                    nuevaFila("idTipoPoliza") = If(tipoPolizaDict.ContainsKey(tipoPoliza), tipoPolizaDict(tipoPoliza), 0)
+                    'nuevaFila("ClaveRubro") = If(rubrosDict.ContainsKey(nuevaFila("Referencia").ToString()), rubrosDict(nuevaFila("Referencia").ToString()), "")
+                    nuevaFila("ClaveRubro") = If(rubrosDict.ContainsKey(referencia), rubrosDict(referencia), "")
 
                     MiDatosContPaqDT.Rows.Add(nuevaFila)
-                    registrosProcesados += 1
+                    'registrosProcesados += 1
                 End If
-
-                'Catch rowEx As Exception
-                'diagnostico.AppendLine($"Error en fila {i}: {rowEx.Message}")
-                'Continue For
-                'End Try
 
                 x += 1
             Next
-
-            'diagnostico.AppendLine($"Procesamiento completado. Registros agregados: {registrosProcesados}")
-
-            ' Verificar resultados
-            'If MiDatosContPaqDT.Rows.Count = 0 Then
-            'diagnostico.AppendLine("ERROR: No se procesaron datos")
-            'Throw New Exception("No se encontraron datos válidos en el archivo Excel")
-            'End If
-
-            'diagnostico.AppendLine($"=== PROCESO EXITOSO === Filas en DataTable: {MiDatosContPaqDT.Rows.Count}")
-
         Catch ex As Exception
-            'diagnostico.AppendLine($"EXCEPCIÓN CAPTURADA: {ex.Message}")
-            'diagnostico.AppendLine($"StackTrace: {ex.StackTrace}")
-
-            ' Remover MessageBox para producción
-            ' MessageBox.Show(diagnostico.ToString(), "Diagnóstico del Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
-
-            'e.Result = ex
-            'Console.WriteLine(diagnostico.ToString())
-
             If MiDatosContPaqDT IsNot Nothing Then
                 MiDatosContPaqDT.Dispose()
                 MiDatosContPaqDT = Nothing
             End If
-
         Finally
-            ' Escribir todo el diagnóstico
-            'Console.WriteLine(diagnostico.ToString())
+            If excelApp IsNot Nothing Then
+                excelApp.ScreenUpdating = True
+                excelApp.DisplayAlerts = True
+                excelApp.Calculation = XlCalculation.xlCalculationAutomatic
+                excelApp.EnableEvents = True
+            End If
 
-            ' Liberar recursos COM
-            Try
-                If excelApp IsNot Nothing Then
-                    excelApp.ScreenUpdating = True
-                    excelApp.DisplayAlerts = True
-                    Try
-                        excelApp.Calculation = XlCalculation.xlCalculationAutomatic
-                    Catch
-                        ' Ignorar errores al restaurar cálculo
-                    End Try
-                    excelApp.EnableEvents = True
-                End If
+            If excelWorkSheet IsNot Nothing Then
+                Marshal.ReleaseComObject(excelWorkSheet)
+                excelWorkSheet = Nothing
+            End If
 
-                If excelWorkSheet IsNot Nothing Then
-                    Marshal.ReleaseComObject(excelWorkSheet)
-                    excelWorkSheet = Nothing
-                End If
+            If excelWorkBook IsNot Nothing Then
+                excelWorkBook.Close(False)
+                Marshal.ReleaseComObject(excelWorkBook)
+                excelWorkBook = Nothing
+            End If
 
-                If excelWorkBook IsNot Nothing Then
-                    excelWorkBook.Close(False)
-                    Marshal.ReleaseComObject(excelWorkBook)
-                    excelWorkBook = Nothing
-                End If
-
-                If excelApp IsNot Nothing Then
-                    excelApp.Quit()
-                    Marshal.ReleaseComObject(excelApp)
-                    excelApp = Nothing
-                End If
-
-                GC.Collect()
-                GC.WaitForPendingFinalizers()
-                GC.Collect()
-
-            Catch comEx As Exception
-                Debug.WriteLine($"Error liberando recursos COM: {comEx.Message}")
-            End Try
+            If excelApp IsNot Nothing Then
+                excelApp.Quit()
+                Marshal.ReleaseComObject(excelApp)
+                excelApp = Nothing
+            End If
+            GC.Collect()
+            GC.WaitForPendingFinalizers()
+            GC.Collect()
         End Try
     End Sub
 
@@ -468,7 +396,6 @@ Public Class FrmImportarDatos
         MyProgressBar1.Value = 0
         LblProgreso.Text = ""
 
-        ' CORRECCIÓN: Verificar si hubo errores
         If e.Result IsNot Nothing AndAlso TypeOf e.Result Is Exception Then
             Dim ex As Exception = CType(e.Result, Exception)
             MessageBox.Show("Error al importar el archivo de CONTPAQi: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -476,14 +403,12 @@ Public Class FrmImportarDatos
             Return
         End If
 
-        ' CORRECCIÓN: Verificar que los datos se cargaron correctamente antes de continuar
         If MiDatosContPaqDT Is Nothing OrElse MiDatosContPaqDT.Rows.Count = 0 Then
             MessageBox.Show("No se encontraron datos válidos en el archivo seleccionado.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             BtnAnalizar.Enabled = False
             Return
         End If
 
-        'MessageBox.Show($"El archivo de CONTPAQi fue importado con éxito. Se procesaron {MiDatosContPaqDT.Rows.Count} registros.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information)
         MiNuevosMovimientos()
         BtnAnalizar.Enabled = True
     End Sub
@@ -578,7 +503,6 @@ Public Class FrmImportarDatos
     Private Function ConstruirFiltroBusqueda(texto As String) As String
         Dim criterio = texto.Replace("'", "''")
 
-        ' CORRECCIÓN: Columnas que realmente existen en el DataTable
         Dim columnasTexto = New String() {
             "Cuenta", "TipoTrabajador", "Nombre", "TipoPoliza", "Concepto", "Referencia"
         }
