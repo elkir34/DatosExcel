@@ -183,21 +183,13 @@ Public Class FrmImportarDatos
             ' Obtener el rango usado y cargarlo en array - AQUÍ ESTÁ LA OPTIMIZACIÓN
             Dim usedRange = excelWorkSheet.UsedRange
 
-            'aqui si entra 
-            'MsgBox("Rango usado: " & usedRange.Address & " - Filas: " & usedRange.Rows.Count & ", Columnas: " & usedRange.Columns.Count)
-
             If usedRange Is Nothing Then Throw New Exception("No hay datos en la hoja de Excel")
 
             Dim totalRows As Integer = usedRange.Rows.Count
             Dim totalCols As Integer = usedRange.Columns.Count
 
-            'MsgBox("Total de filas detectadas: " & totalRows & ", Total de columnas detectadas tienen que ser 8: " & totalCols) ' Mensaje para verificar filas y columnas detectadas
-
             If totalCols < 8 Then Throw New Exception("El número de columnas en la hoja de Excel no es el esperado: " & totalCols)
             If totalRows = 0 Then Throw New Exception("No hay datos en la hoja de Excel")
-
-            'aqui ya no entra
-            'MsgBox("Total de filas a procesar: " & totalRows) ' Mensaje para verificar el número de filas detectadas
 
             ' CARGAR TODO EL RANGO EN UN ARRAY DE UNA SOLA VEZ
             Dim dataArray As Object(,) = usedRange.Value
@@ -390,7 +382,7 @@ Public Class FrmImportarDatos
         If FrmAbierto Then
             MsgBox("Ya existe una ventana de análisis abierta...")
         Else
-            Dim FrmAnalizarNomina As New FrmAnalizarNomina(MiDatosContPaqBS)
+            Dim FrmAnalizarNomina As New FrmAnalizarContabilidad(MiDatosContPaqBS)
             FrmAnalizarNomina.Show()
         End If
     End Sub

@@ -1,6 +1,6 @@
 ﻿Imports MySql.Data.MySqlClient
 
-Public Class FrmAnalizarNomina
+Public Class FrmAnalizarContabilidad
     Private MiDatosCONTPAQiBS As BindingSource
     Private WithEvents MiDatosCONTPAQiAgrupadosBS As BindingSource
     Private MiDatosSistemaTrabajadoresDT As DataTable
@@ -12,7 +12,7 @@ Public Class FrmAnalizarNomina
         MiDatosCONTPAQiBS = bindingSource
     End Sub
 
-    Private Sub FrmAnalizarNomina_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub FrmAnalizarContabilidad_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         TxtAbonos.Text = "0.00"
         TxtCargos.Text = "0.00"
 
