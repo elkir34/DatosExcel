@@ -102,6 +102,7 @@ Public Class FrmAnalizar
             If campoRegistros Then cellFormatInfo(rowKey).Add("Registros")
             If campoSumaCargos Then cellFormatInfo(rowKey).Add("SumaCargos")
             If campoSumaAbonos Then cellFormatInfo(rowKey).Add("SumaAbonos")
+
         Next
     End Sub
 
@@ -127,9 +128,11 @@ Public Class FrmAnalizar
         If MiDatosContPaqBS.Count > 0 Then
             MiDatosContPaqBS.Sort = "Fecha ASC, Numero ASC, TipoPoliza ASC, TipoTrabajador ASC, Nombre ASC"
 
+            'Se saca el periódo de pólizas, después de ordenar los datos que se sacaron de Excel desde CONTPAQi
             FechaInicio = CDate(CType(MiDatosContPaqBS.List(0), DataRowView)("Fecha")).ToString("yyyy-MM-dd")
             FechaFin = CDate(CType(MiDatosContPaqBS.List(MiDatosContPaqBS.Count - 1), DataRowView)("Fecha")).ToString("yyyy-MM-dd")
 
+            'Se sacan los datos de la BD de trabajadores para el periodo de polizas, de forma agrupada para analizar.
             Dim strSQL As String = "SELECT DATE_FORMAT(Fecha,'%d/%m/%Y') AS Fecha, Poliza AS Numero, TipoPoliza, count(idCargo) AS Registros, ROUND(SUM(Cargo),2) AS SumaCargos, ROUND(SUM(Abono),2) AS SumaAbonos 
                                 FROM tbl_cargos 
                                     INNER JOIN ctg_tipopoliza ON ctg_tipopoliza.idTipoPoliza=tbl_cargos.idTipoPoliza 

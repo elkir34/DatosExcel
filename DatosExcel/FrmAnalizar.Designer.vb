@@ -24,9 +24,9 @@ Partial Class FrmAnalizar
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(FrmAnalizar))
-        Dim DataGridViewCellStyle1 As DataGridViewCellStyle = New DataGridViewCellStyle()
-        Dim DataGridViewCellStyle2 As DataGridViewCellStyle = New DataGridViewCellStyle()
-        Dim DataGridViewCellStyle3 As DataGridViewCellStyle = New DataGridViewCellStyle()
+        Dim DataGridViewCellStyle4 As DataGridViewCellStyle = New DataGridViewCellStyle()
+        Dim DataGridViewCellStyle5 As DataGridViewCellStyle = New DataGridViewCellStyle()
+        Dim DataGridViewCellStyle6 As DataGridViewCellStyle = New DataGridViewCellStyle()
         BackgroundWorker1 = New ComponentModel.BackgroundWorker()
         LblProgreso = New ToolStripLabel()
         MyProgressBar1 = New ToolStripProgressBar()
@@ -154,8 +154,8 @@ Partial Class FrmAnalizar
         TableLayoutPanel1.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100F))
         TableLayoutPanel1.Controls.Add(ToolStrip1, 0, 0)
         TableLayoutPanel1.Controls.Add(MiDataGrid, 0, 1)
-        TableLayoutPanel1.Controls.Add(ToolStrip2, 0, 3)
         TableLayoutPanel1.Controls.Add(Panel1, 0, 2)
+        TableLayoutPanel1.Controls.Add(ToolStrip2, 0, 3)
         TableLayoutPanel1.Dock = DockStyle.Fill
         TableLayoutPanel1.Location = New Point(0, 0)
         TableLayoutPanel1.Name = "TableLayoutPanel1"
@@ -208,33 +208,33 @@ Partial Class FrmAnalizar
         ' 
         MiDataGrid.AllowUserToAddRows = False
         MiDataGrid.AllowUserToDeleteRows = False
-        DataGridViewCellStyle1.BackColor = Color.Silver
-        DataGridViewCellStyle1.ForeColor = Color.Black
-        DataGridViewCellStyle1.SelectionBackColor = Color.DodgerBlue
-        DataGridViewCellStyle1.SelectionForeColor = Color.White
-        MiDataGrid.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle1
-        DataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter
-        DataGridViewCellStyle2.BackColor = SystemColors.Control
-        DataGridViewCellStyle2.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        DataGridViewCellStyle2.ForeColor = SystemColors.WindowText
-        DataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight
-        DataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText
-        DataGridViewCellStyle2.WrapMode = DataGridViewTriState.True
-        MiDataGrid.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle2
+        DataGridViewCellStyle4.BackColor = Color.Silver
+        DataGridViewCellStyle4.ForeColor = Color.Black
+        DataGridViewCellStyle4.SelectionBackColor = Color.DodgerBlue
+        DataGridViewCellStyle4.SelectionForeColor = Color.White
+        MiDataGrid.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle4
+        DataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleCenter
+        DataGridViewCellStyle5.BackColor = SystemColors.Control
+        DataGridViewCellStyle5.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        DataGridViewCellStyle5.ForeColor = SystemColors.WindowText
+        DataGridViewCellStyle5.SelectionBackColor = SystemColors.Highlight
+        DataGridViewCellStyle5.SelectionForeColor = SystemColors.HighlightText
+        DataGridViewCellStyle5.WrapMode = DataGridViewTriState.True
+        MiDataGrid.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle5
         MiDataGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
         MiDataGrid.ContextMenuStrip = ContextMenuStrip1
         MiDataGrid.Dock = DockStyle.Fill
         MiDataGrid.Location = New Point(3, 58)
         MiDataGrid.Name = "MiDataGrid"
         MiDataGrid.ReadOnly = True
-        DataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter
-        DataGridViewCellStyle3.BackColor = SystemColors.Control
-        DataGridViewCellStyle3.Font = New Font("Segoe UI", 9F)
-        DataGridViewCellStyle3.ForeColor = SystemColors.WindowText
-        DataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight
-        DataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText
-        DataGridViewCellStyle3.WrapMode = DataGridViewTriState.True
-        MiDataGrid.RowHeadersDefaultCellStyle = DataGridViewCellStyle3
+        DataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleCenter
+        DataGridViewCellStyle6.BackColor = SystemColors.Control
+        DataGridViewCellStyle6.Font = New Font("Segoe UI", 9F)
+        DataGridViewCellStyle6.ForeColor = SystemColors.WindowText
+        DataGridViewCellStyle6.SelectionBackColor = SystemColors.Highlight
+        DataGridViewCellStyle6.SelectionForeColor = SystemColors.HighlightText
+        DataGridViewCellStyle6.WrapMode = DataGridViewTriState.True
+        MiDataGrid.RowHeadersDefaultCellStyle = DataGridViewCellStyle6
         MiDataGrid.RowHeadersWidth = 25
         MiDataGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect
         MiDataGrid.Size = New Size(939, 459)
@@ -254,11 +254,11 @@ Partial Class FrmAnalizar
         ' 
         ' ToolStrip2
         ' 
-        ToolStrip2.Dock = DockStyle.Fill
+        ToolStrip2.Dock = DockStyle.None
         ToolStrip2.Items.AddRange(New ToolStripItem() {BtnPrimero, BtnAnterior, ToolStripSeparator5, TxtRegistro, TxtTotalRegistros, ToolStripSeparator4, BtnSiguiente, BtnUltimo, ToolStripSeparator1, BtnActualizar, ToolStripSeparator3, MyProgressBar1, LblProgreso, BtnAceptar, LblAbonos, LblCargos, ToolStripLabel2, LblSeleccion, ToolStripLabel1})
         ToolStrip2.Location = New Point(0, 555)
         ToolStrip2.Name = "ToolStrip2"
-        ToolStrip2.Size = New Size(945, 62)
+        ToolStrip2.Size = New Size(929, 62)
         ToolStrip2.TabIndex = 3
         ToolStrip2.Text = "ToolStrip2"
         ' 
