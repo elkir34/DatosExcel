@@ -9,6 +9,6 @@
     End Sub
 
     Private Sub BtnNomiPaq_Click(sender As Object, e As EventArgs) Handles BtnNomiPaq.Click
-        FrmNomipaqDatos.Show()
+        'FrmNomipaqDatos.Show()
     End Sub
 End Class

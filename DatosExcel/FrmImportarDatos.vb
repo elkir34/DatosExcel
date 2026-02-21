@@ -5,7 +5,7 @@ Imports System.Runtime.InteropServices
 Public Class FrmImportarDatos
     Private x, y As Integer
     Private MiDatosContPaqDT As Data.DataTable
-    Private WithEvents MiDatosContPaqBS As BindingSource
+    'Private WithEvents MiDatosContPaqBS As BindingSource
     Dim MyIndex As Integer
 
     Private empleadosDict As Dictionary(Of Integer, Integer) 'Clave: noCuenta, Valor: idEmpleado
@@ -17,32 +17,32 @@ Public Class FrmImportarDatos
         LblSeleccion.Text = "0"
         LblCargos.Text = "0.00"
         LblAbonos.Text = "0.00"
-        TxtTotalRegistros.Text = "0"
+        'TxtTotalRegistros.Text = "0"
         TxtAbonos.Text = "0.00"
         TxtCargos.Text = "0.00"
         BtnAnalizar.Enabled = False
-        BtnPrimero.Enabled = False
-        BtnAnterior.Enabled = False
-        BtnSiguiente.Enabled = False
-        BtnUltimo.Enabled = False
-        BtnActualizar.Enabled = False
+        'BtnPrimero.Enabled = False
+        'BtnAnterior.Enabled = False
+        'BtnSiguiente.Enabled = False
+        'BtnUltimo.Enabled = False
+        'BtnActualizar.Enabled = False
 
         ' Configurar BackgroundWorker
-        If BackgroundWorker1 Is Nothing Then
-            BackgroundWorker1 = New ComponentModel.BackgroundWorker With {
-                .WorkerReportsProgress = True
-            }
-        End If
+        'If BackgroundWorker1 Is Nothing Then
+        'BackgroundWorker1 = New ComponentModel.BackgroundWorker With {
+        '.WorkerReportsProgress = True
+        '   }
+        'End If
     End Sub
 
     Private Sub BtnAbrirArchivo_Click(sender As Object, e As EventArgs) Handles BtnAbrirArchivo.Click
         OpenFileDialog1.Filter = "Archivos de Excel (*.xlsx;*.xls)|*.xlsx;*.xls|Todos los archivos (*.*)|*.*"
         OpenFileDialog1.FilterIndex = 1
-        OpenFileDialog1.Title = "Seleccionar archivo de Excel generado en CONTPAQi"
+        OpenFileDialog1.Title = "Seleccionar archivo de Excel generado en CONTPAQi Contabilidad"
 
         If OpenFileDialog1.ShowDialog = System.Windows.Forms.DialogResult.OK Then
             TxtNombreArchivo.Text = OpenFileDialog1.FileName
-            MiDataGrid.Columns.Clear()
+            'MiDataGrid.Columns.Clear()
             BackgroundWorker1.RunWorkerAsync()
         End If
     End Sub
@@ -53,52 +53,54 @@ Public Class FrmImportarDatos
             Return
         End If
 
-        MiDatosContPaqBS = New BindingSource With {.DataSource = MiDatosContPaqDT}
-        MiDataGrid.DataSource = MiDatosContPaqBS
+        'MiDatosContPaqBS = New BindingSource With {.DataSource = MiDatosContPaqDT}
+        MiDataGrid.AutoGenerateColumns = False
+        'MiDataGrid.DataSource = MiDatosContPaqBS
+        MiDataGrid.DataSource = MiDatosContPaqDT
 
         ' Solo configurar columnas si existen
-        If MiDataGrid.Columns.Count >= 13 Then
-            MiDataGrid.Columns(0).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter 'Cuenta
-            MiDataGrid.Columns(1).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter 'TipoTrabajador
-            MiDataGrid.Columns(5).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight 'Numero de póliza
-            MiDataGrid.Columns(8).DefaultCellStyle.Format = "N2" 'Cargos
-            MiDataGrid.Columns(8).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight 'Cargos
-            MiDataGrid.Columns(9).DefaultCellStyle.Format = "N2" 'Abonos
-            MiDataGrid.Columns(9).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight 'Abonos
-            MiDataGrid.Columns(0).Width = 50   'Cuenta
-            MiDataGrid.Columns(1).Width = 80   'Tipo de Trabajador
-            MiDataGrid.Columns(2).Width = 250  'Nombre
-            MiDataGrid.Columns(3).Width = 80   'Fecha
-            MiDataGrid.Columns(4).Width = 100  'Tipo de póliza
-            MiDataGrid.Columns(5).Width = 60   'Número
-            MiDataGrid.Columns(6).Width = 250  'Concepto
-            MiDataGrid.Columns(7).Width = 100  'Referencia
-            MiDataGrid.Columns(8).Width = 100  'Cargos
-            MiDataGrid.Columns(9).Width = 100  'Abonos
-            MiDataGrid.Columns(1).HeaderText = "Tipo de trabajador"
-            MiDataGrid.Columns(4).HeaderText = "Tipo de póliza"
-            MiDataGrid.Columns(2).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill  'Nombre
-            MiDataGrid.Columns(10).Visible = False  'idEmpleado
-            MiDataGrid.Columns(11).Visible = False 'idTipoPoliza
-            MiDataGrid.Columns(12).Visible = False 'ClaveRubro
-        End If
+        'If MiDataGrid.Columns.Count >= 13 Then
+        'MiDataGrid.Columns(0).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter 'Cuenta
+        'MiDataGrid.Columns(1).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter 'TipoTrabajador
+        'MiDataGrid.Columns(5).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight 'Numero de póliza
+        'MiDataGrid.Columns(8).DefaultCellStyle.Format = "N2" 'Cargos
+        'MiDataGrid.Columns(8).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight 'Cargos
+        'MiDataGrid.Columns(9).DefaultCellStyle.Format = "N2" 'Abonos
+        'MiDataGrid.Columns(9).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight 'Abonos
+        'MiDataGrid.Columns(0).Width = 50   'Cuenta
+        'MiDataGrid.Columns(1).Width = 80   'Tipo de Trabajador
+        'MiDataGrid.Columns(2).Width = 250  'Nombre
+        'MiDataGrid.Columns(3).Width = 80   'Fecha
+        'MiDataGrid.Columns(4).Width = 100  'Tipo de póliza
+        'MiDataGrid.Columns(5).Width = 60   'Número
+        'MiDataGrid.Columns(6).Width = 250  'Concepto
+        'MiDataGrid.Columns(7).Width = 100  'Referencia
+        'MiDataGrid.Columns(8).Width = 100  'Cargos
+        'MiDataGrid.Columns(9).Width = 100  'Abonos
+        'MiDataGrid.Columns(1).HeaderText = "Tipo de trabajador"
+        'MiDataGrid.Columns(4).HeaderText = "Tipo de póliza"
+        'MiDataGrid.Columns(2).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill  'Nombre
+        'MiDataGrid.Columns(10).Visible = False  'idEmpleado
+        'MiDataGrid.Columns(11).Visible = False 'idTipoPoliza
+        'MiDataGrid.Columns(12).Visible = False 'ClaveRubro
+        'End If
 
-        AddHandler MiDatosContPaqBS.PositionChanged, AddressOf MiDatosContPaqBS_PositionChanged
-        TxtTotalRegistros.Text = MiDatosContPaqBS.Count.ToString()
-        BtnActualizar.Enabled = MiDatosContPaqBS.Count > 0
-        MiDatosContPaqBS_PositionChanged(Nothing, Nothing)
+        'AddHandler MiDatosContPaqBS.PositionChanged, AddressOf MiDatosContPaqBS_PositionChanged
+        'TxtTotalRegistros.Text = MiDatosContPaqBS.Count.ToString()
+        'BtnActualizar.Enabled = MiDatosContPaqBS.Count > 0
+        'MiDatosContPaqBS_PositionChanged(Nothing, Nothing)
         SumarCargosYAbonos()
-        MiDatosContPaqBS.Sort = "Fecha ASC, Numero ASC, TipoPoliza ASC, Nombre ASC"
+        'MiDatosContPaqBS.Sort = "Fecha ASC, Numero ASC, TipoPoliza ASC, Nombre ASC"
     End Sub
 
-    Private Sub MiDatosContPaqBS_PositionChanged(sender As Object, e As EventArgs) Handles MiDatosContPaqBS.PositionChanged
-        TxtRegistro.Text = (MiDatosContPaqBS.Position + 1).ToString
-        TxtTotalRegistros.Text = MiDatosContPaqBS.Count.ToString
-        BtnPrimero.Enabled = MiDatosContPaqBS.Position > 0
-        BtnAnterior.Enabled = MiDatosContPaqBS.Position > 0
-        BtnSiguiente.Enabled = MiDatosContPaqBS.Position < MiDatosContPaqBS.Count - 1
-        BtnUltimo.Enabled = MiDatosContPaqBS.Position < MiDatosContPaqBS.Count - 1
-    End Sub
+    'Private Sub MiDatosContPaqBS_PositionChanged(sender As Object, e As EventArgs) Handles MiDatosContPaqBS.PositionChanged
+    ' '   TxtRegistro.Text = (MiDatosContPaqBS.Position + 1).ToString
+    '  '  TxtTotalRegistros.Text = MiDatosContPaqBS.Count.ToString
+    '    BtnPrimero.Enabled = MiDatosContPaqBS.Position > 0
+    '    BtnAnterior.Enabled = MiDatosContPaqBS.Position > 0
+    '    BtnSiguiente.Enabled = MiDatosContPaqBS.Position < MiDatosContPaqBS.Count - 1
+    '    BtnUltimo.Enabled = MiDatosContPaqBS.Position < MiDatosContPaqBS.Count - 1
+    'End Sub
 
     Private Sub MiCargarDiccionarios()
         Dim sqlConexion As New MySqlConnection("allowuservariables=True; server=localhost; User Id=buzosbyp_erp; password=Mientras12$; database=buzosbyp_erp")
@@ -168,34 +170,20 @@ Public Class FrmImportarDatos
         Try
             Dim miruta As String = ""
             Me.Invoke(Sub() miruta = OpenFileDialog1.FileName)
-            ' Verificar que el archivo existe
-            If String.IsNullOrEmpty(miruta) OrElse Not System.IO.File.Exists(miruta) Then
-                Throw New System.IO.FileNotFoundException("El archivo no existe: " & miruta)
-            End If
+            If String.IsNullOrEmpty(miruta) OrElse Not System.IO.File.Exists(miruta) Then Throw New System.IO.FileNotFoundException("El archivo no existe: " & miruta)
 
             excelApp = New Application With {.ScreenUpdating = False, .DisplayAlerts = False, .EnableEvents = False}
             excelWorkBook = excelApp.Workbooks.Open(miruta)
             excelApp.Calculation = XlCalculation.xlCalculationManual
-
-            ' Obtener la hoja de trabajo
             excelWorkSheet = excelWorkBook.Worksheets(1)
-
-            ' Obtener el rango usado y cargarlo en array - AQUÍ ESTÁ LA OPTIMIZACIÓN
             Dim usedRange = excelWorkSheet.UsedRange
-
             If usedRange Is Nothing Then Throw New Exception("No hay datos en la hoja de Excel")
-
             Dim totalRows As Integer = usedRange.Rows.Count
             Dim totalCols As Integer = usedRange.Columns.Count
-
             If totalCols < 8 Then Throw New Exception("El número de columnas en la hoja de Excel no es el esperado: " & totalCols)
             If totalRows = 0 Then Throw New Exception("No hay datos en la hoja de Excel")
-
-            ' CARGAR TODO EL RANGO EN UN ARRAY DE UNA SOLA VEZ
-            Dim dataArray As Object(,) = usedRange.Value
-
-            ' Liberar el rango usado inmediatamente
-            Marshal.ReleaseComObject(usedRange)
+            Dim dataArray As Object(,) = usedRange.Value 'Cargar todo el libro
+            Marshal.ReleaseComObject(usedRange) 'Liberar libro
 
             MiDatosContPaqDT = New Data.DataTable
             MiDatosContPaqDT.Columns.Add("Cuenta")
@@ -212,9 +200,8 @@ Public Class FrmImportarDatos
             MiDatosContPaqDT.Columns.Add("idTipoPoliza", GetType(Integer))
             MiDatosContPaqDT.Columns.Add("ClaveRubro")
 
-            Dim miCuenta, miNombre, miTipoTrabajador As String
+            Dim miCuenta, miNombre, miTipoTrabajador, miCelda As String
             Dim miBanderaCuenta As Boolean = False
-            Dim miCelda As String
 
             x = 0
             y = totalRows
@@ -245,8 +232,7 @@ Public Class FrmImportarDatos
                     Dim cuentaInt As Integer = If(IsNumeric(miCuenta), Convert.ToInt32(miCuenta), 0)
 
                     Dim nuevaFila As DataRow = MiDatosContPaqDT.NewRow()
-                    Dim idEmpleadoValue As Integer
-                    Dim idTipoPolizaValue As Integer = 0
+                    Dim idEmpleadoValue, idTipoPolizaValue As Integer
                     Dim idClaveRubroValue As String = ""
 
                     nuevaFila("Cuenta") = miCuenta
@@ -329,45 +315,45 @@ Public Class FrmImportarDatos
         BtnAnalizar.Enabled = True
     End Sub
 
-    Private Sub BtnPrimero_Click(sender As Object, e As EventArgs) Handles BtnPrimero.Click
-        MiDatosContPaqBS.MoveFirst()
+    Private Sub BtnPrimero_Click(sender As Object, e As EventArgs)
+        'MiDatosContPaqBS.MoveFirst()
     End Sub
 
-    Private Sub BtnUltimo_Click(sender As Object, e As EventArgs) Handles BtnUltimo.Click
-        MiDatosContPaqBS.MoveLast()
+    Private Sub BtnUltimo_Click(sender As Object, e As EventArgs)
+        'MiDatosContPaqBS.MoveLast()
     End Sub
 
-    Private Sub BtnAnterior_Click(sender As Object, e As EventArgs) Handles BtnAnterior.Click
-        MiDatosContPaqBS.MovePrevious()
+    Private Sub BtnAnterior_Click(sender As Object, e As EventArgs)
+        'MiDatosContPaqBS.MovePrevious()
     End Sub
 
-    Private Sub BtnSiguiente_Click(sender As Object, e As EventArgs) Handles BtnSiguiente.Click
-        MiDatosContPaqBS.MoveNext()
+    Private Sub BtnSiguiente_Click(sender As Object, e As EventArgs)
+        'MiDatosContPaqBS.MoveNext()
     End Sub
 
-    Private Sub AbrirFrmAnalizar()
-        Dim FrmAbierto As Boolean = False
-
-        For Each frm As Form In My.Application.OpenForms
-            If frm.Name = "FrmAnalizar" Then
-                FrmAbierto = True
-            End If
-        Next
-        If FrmAbierto Then
-            MsgBox("Ya existe una ventana de análisis abierta...")
-        Else
-            Dim FrmAnalizar As New FrmAnalizar(MiDatosContPaqBS)
-            FrmAnalizar.Show()
-        End If
-    End Sub
+    'Private Sub AbrirFrmAnalizar()
+    'Dim FrmAbierto As Boolean = False
+    '
+    'For Each frm As Form In My.Application.OpenForms
+    'If frm.Name = "FrmAnalizar" Then
+    '            FrmAbierto = True
+    'End If
+    'Next
+    'If FrmAbierto Then
+    '        MsgBox("Ya existe una ventana de análisis abierta...")
+    'Else
+    'Dim FrmAnalizar As New FrmAnalizar(MiDatosContPaqDT)
+    '        FrmAnalizar.Show()
+    'End If
+    'End Sub
 
     Private Sub BtnAnalizar_Click(sender As Object, e As EventArgs) Handles BtnAnalizar.Click
-        If TxtBuscar.TextLength > 0 Then
-            If MsgBox("¿Desea quitar el filtro de búsqueda?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
-                MiDatosContPaqBS.RemoveFilter()
-                TxtBuscar.Text = ""
-            End If
-        End If
+        'If TxtBuscar.TextLength > 0 Then
+        'If MsgBox("¿Desea quitar el filtro de búsqueda?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+        'MiDatosContPaqBS.RemoveFilter()
+        'TxtBuscar.Text = ""
+        'End If
+        'End If
         AbrirFrmAnalizar2()
     End Sub
 
@@ -375,15 +361,15 @@ Public Class FrmImportarDatos
         Dim FrmAbierto As Boolean = False
 
         For Each frm As Form In My.Application.OpenForms
-            If frm.Name = "FrmAnalizarNomina" Then
+            If frm.Name = "FrmAnalizarContabilidad" Then
                 FrmAbierto = True
             End If
         Next
         If FrmAbierto Then
             MsgBox("Ya existe una ventana de análisis abierta...")
         Else
-            Dim FrmAnalizarNomina As New FrmAnalizarContabilidad(MiDatosContPaqBS)
-            FrmAnalizarNomina.Show()
+            Dim FrmAnalizarContabilidad As New FrmAnalizarContabilidad(MiDatosContPaqDT)
+            FrmAnalizarContabilidad.Show()
         End If
     End Sub
 
@@ -423,15 +409,15 @@ Public Class FrmImportarDatos
         End If
     End Sub
 
-    Private Sub TxtBuscar_TextChanged(sender As Object, e As EventArgs) Handles TxtBuscar.TextChanged
-        If String.IsNullOrWhiteSpace(TxtBuscar.Text) Then
-            MiDatosContPaqBS.RemoveFilter()
-        Else
-            MiDatosContPaqBS.Filter = ConstruirFiltroBusqueda(TxtBuscar.Text.Trim())
-        End If
-        MiDatosContPaqBS_PositionChanged(Nothing, Nothing)
-        SumarCargosYAbonos()
-    End Sub
+    'Private Sub TxtBuscar_TextChanged(sender As Object, e As EventArgs)
+    'If String.IsNullOrWhiteSpace(TxtBuscar.Text) Then
+    'MiDatosContPaqBS.RemoveFilter
+    'Else
+    'MiDatosContPaqBS.Filter = ConstruirFiltroBusqueda(TxtBuscar.Text.Trim)
+    'End If
+    'MiDatosContPaqBS_PositionChanged(Nothing, Nothing)
+    'SumarCargosYAbonos()
+    'End Sub
 
     Private Function ConstruirFiltroBusqueda(texto As String) As String
         Dim criterio = texto.Replace("'", "''")
@@ -452,41 +438,41 @@ Public Class FrmImportarDatos
         Return String.Join(" OR ", filtroPartes)
     End Function
 
-    Private Sub TxtBuscar_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBuscar.KeyDown
-        If MiDatosContPaqBS IsNot Nothing AndAlso MiDatosContPaqBS.Count > 0 Then
-            Select Case e.KeyCode
-                Case Keys.Up
-                    MiDatosContPaqBS.MovePrevious()
-                Case Keys.Down
-                    MiDatosContPaqBS.MoveNext()
-                Case Keys.Home
-                    MiDatosContPaqBS.MoveFirst()
-                Case Keys.End
-                    MiDatosContPaqBS.MoveLast()
-                Case Keys.Left
-                    MoverCeldaIzquierda()
-                Case Keys.Right
-                    MoverCeldaDerecha()
-            End Select
-        End If
-        e.Handled = True
-    End Sub
+    'Private Sub TxtBuscar_KeyDown(sender As Object, e As KeyEventArgs)
+    'If MiDatosContPaqBS IsNot Nothing AndAlso MiDatosContPaqBS.Count > 0 Then
+    'Select Case e.KeyCode
+    'Case Keys.Up
+    '                MiDatosContPaqBS.MovePrevious
+    'Case Keys.Down
+    '                MiDatosContPaqBS.MoveNext
+    'Case Keys.Home
+    '                MiDatosContPaqBS.MoveFirst
+    ' Case Keys.End
+    '                MiDatosContPaqBS.MoveLast
+    'Case Keys.Left
+    '                MoverCeldaIzquierda()
+    'Case Keys.Right
+    '                MoverCeldaDerecha()
+    'End Select
+    'End If
+    '    e.Handled = True
+    'End Sub
 
-    Private Sub MoverCeldaIzquierda()
-        If MiDataGrid.CurrentCell IsNot Nothing AndAlso MiDataGrid.CurrentCell.ColumnIndex > 0 Then
-            Dim nuevaColumna As Integer = MiDataGrid.CurrentCell.ColumnIndex - 1
-            MiDataGrid.CurrentCell = MiDataGrid.Rows(MiDataGrid.CurrentCell.RowIndex).Cells(nuevaColumna)
-        End If
-    End Sub
+    'Private Sub MoverCeldaIzquierda()
+    'If MiDataGrid.CurrentCell IsNot Nothing AndAlso MiDataGrid.CurrentCell.ColumnIndex > 0 Then
+    'Dim nuevaColumna As Integer = MiDataGrid.CurrentCell.ColumnIndex - 1
+    '        MiDataGrid.CurrentCell = MiDataGrid.Rows(MiDataGrid.CurrentCell.RowIndex).Cells(nuevaColumna)
+    'End If
+    'End Sub
 
-    Private Sub MoverCeldaDerecha()
-        If MiDataGrid.CurrentCell IsNot Nothing AndAlso MiDataGrid.CurrentCell.ColumnIndex < MiDataGrid.ColumnCount - 1 Then
-            Dim nuevaColumna As Integer = MiDataGrid.CurrentCell.ColumnIndex + 1
-            MiDataGrid.CurrentCell = MiDataGrid.Rows(MiDataGrid.CurrentCell.RowIndex).Cells(nuevaColumna)
-        End If
-    End Sub
+    'Private Sub MoverCeldaDerecha()
+    'If MiDataGrid.CurrentCell IsNot Nothing AndAlso MiDataGrid.CurrentCell.ColumnIndex < MiDataGrid.ColumnCount - 1 Then
+    'Dim nuevaColumna As Integer = MiDataGrid.CurrentCell.ColumnIndex + 1
+    '       MiDataGrid.CurrentCell = MiDataGrid.Rows(MiDataGrid.CurrentCell.RowIndex).Cells(nuevaColumna)
+    'End If
+    'End Sub
 
-    Private Sub BtnConciliar_Click(sender As Object, e As EventArgs) Handles BtnConciliar.Click
-
-    End Sub
+    'Private Sub BtnConciliar_Click(sender As Object, e As EventArgs) Handles BtnConciliar.Click
+    '
+    'End Sub
 End Class

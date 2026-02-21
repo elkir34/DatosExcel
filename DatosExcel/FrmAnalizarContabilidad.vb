@@ -1,50 +1,44 @@
 ﻿Imports MySql.Data.MySqlClient
 
 Public Class FrmAnalizarContabilidad
-    Private MiDatosCONTPAQiBS As BindingSource
+    Private MiDatosCONTPAQiDT As DataTable
     Private WithEvents MiDatosCONTPAQiAgrupadosBS As BindingSource
-    Private MiDatosSistemaTrabajadoresDT As DataTable
+    Private MiDatosTrabajadoresAgrupadosDT As DataTable
     Private cellFormatInfo As New Dictionary(Of String, HashSet(Of String)) ' Clave: "Numero-TipoPoliza-Fecha", Valor: Campos que coinciden
 
-    Public Sub New(bindingSource As BindingSource)
+    Public Sub New(MiDataTable As DataTable)
         InitializeComponent()
         'Recibir los datos sacados del archivo de Excel generado por CONTPAQi Nóminas
-        MiDatosCONTPAQiBS = bindingSource
+        MiDatosCONTPAQiDT = MiDataTable
     End Sub
 
     Private Sub FrmAnalizarContabilidad_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         TxtAbonos.Text = "0.00"
         TxtCargos.Text = "0.00"
+        TxtFechaInicio.Text = MiDatosCONTPAQiDT.AsEnumerable().Min(Function(row) CDate(row("Fecha"))).ToString("dd/MM/yyyy")
+        TxtFechaFin.Text = MiDatosCONTPAQiDT.AsEnumerable().Max(Function(row) CDate(row("Fecha"))).ToString("dd/MM/yyyy")
 
         MyCargarDatosSistemaTrabajadores()
         MyCargarDatosSistemaCONTPAQiAgrupados()
         MyAnalizarTablas()
-
     End Sub
 
     Private Sub MyCargarDatosSistemaTrabajadores()
         Dim sqlConexion As New MySqlConnection("allowuservariables=True; server=localhost; User Id=buzosbyp_erp; password=Mientras12$; database=buzosbyp_erp")
         Dim segundaTablaDA As MySqlDataAdapter
-        Dim FechaInicio, FechaFin As String
 
-        If MiDatosCONTPAQiBS.Count > 0 Then
-            MiDatosCONTPAQiBS.Sort = "Fecha ASC, Numero ASC, TipoPoliza ASC, TipoTrabajador ASC, Nombre ASC"
-
-            'Se saca el periódo de pólizas, después de ordenar los datos que se sacaron de Excel desde CONTPAQi
-            FechaInicio = CDate(CType(MiDatosCONTPAQiBS.List(0), DataRowView)("Fecha")).ToString("yyyy-MM-dd")
-            FechaFin = CDate(CType(MiDatosCONTPAQiBS.List(MiDatosCONTPAQiBS.Count - 1), DataRowView)("Fecha")).ToString("yyyy-MM-dd")
-
-            'Se sacan los datos de la BD de trabajadores para el periodo de polizas, de forma agrupada para analizar.
-            Dim strSQL As String = "SELECT DATE_FORMAT(Fecha,'%d/%m/%Y') AS Fecha, Poliza AS Numero, TipoPoliza, count(idCargo) AS Registros, ROUND(SUM(Cargo),2) AS SumaCargos, ROUND(SUM(Abono),2) AS SumaAbonos 
+        If MiDatosCONTPAQiDT IsNot Nothing AndAlso MiDatosCONTPAQiDT.Rows.Count > 0 Then
+            Dim strSQL As String = "SELECT Fecha, Poliza AS Numero, TipoPoliza, count(idCargo) AS Registros, ROUND(SUM(Cargo),2) AS SumaCargos, ROUND(SUM(Abono),2) AS SumaAbonos 
                                 FROM tbl_cargos 
                                     INNER JOIN ctg_tipopoliza ON ctg_tipopoliza.idTipoPoliza=tbl_cargos.idTipoPoliza 
-                                WHERE Fecha BETWEEN '" & FechaInicio & "' AND '" & FechaFin & "' 
+                                WHERE Fecha BETWEEN '" & CDate(TxtFechaInicio.Text).ToString("yyyy-MM-dd") & "' AND '" & CDate(TxtFechaFin.Text).ToString("yyyy-MM-dd") & "' 
                                 GROUP BY TipoPoliza, Poliza, Fecha;"
+
             Try
                 sqlConexion.Open()
                 segundaTablaDA = New MySqlDataAdapter(strSQL, sqlConexion)
-                MiDatosSistemaTrabajadoresDT = New DataTable()
-                segundaTablaDA.Fill(MiDatosSistemaTrabajadoresDT)
+                MiDatosTrabajadoresAgrupadosDT = New DataTable()
+                segundaTablaDA.Fill(MiDatosTrabajadoresAgrupadosDT)
             Catch ex As Exception
                 MessageBox.Show(ex.Message)
             Finally
@@ -59,8 +53,7 @@ Public Class FrmAnalizarContabilidad
         Dim agrupacionDict As New Dictionary(Of String, List(Of DataRow))
         Dim resultTable As New DataTable()
 
-        ' Recorrer los datos del BindingSource
-        For Each rowView As DataRowView In MiDatosCONTPAQiBS
+        For Each rowView As DataRowView In MiDatosCONTPAQiDT.DefaultView
             Dim row As DataRow = rowView.Row
             Dim clave As String = $"{row("Numero")}-{row("TipoPoliza")}-{row("Fecha")}"
 
@@ -95,34 +88,34 @@ Public Class FrmAnalizarContabilidad
             resultTable.Rows.Add(newRow)
         Next
 
-        ' Mostrar los datos en el DataGridView
-        MiDatosCONTPAQiAgrupadosBS = New BindingSource With {.DataSource = resultTable}
+        MiDatosCONTPAQiAgrupadosBS = New BindingSource With {.DataSource = resultTable, .Sort = "Fecha ASC, Numero ASC, TipoPoliza ASC"}
+        MiDataGrid.AutoGenerateColumns = False
         MiDataGrid.DataSource = MiDatosCONTPAQiAgrupadosBS
 
-        MiDataGrid.Columns(0).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
-        MiDataGrid.Columns(1).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
-        MiDataGrid.Columns(3).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-        MiDataGrid.Columns(4).DefaultCellStyle.Format = "N2"
-        MiDataGrid.Columns(4).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-        MiDataGrid.Columns(5).DefaultCellStyle.Format = "N2"
-        MiDataGrid.Columns(5).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-        MiDataGrid.Columns(6).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
-        MiDataGrid.Columns(0).Width = 100   'Fecha
-        MiDataGrid.Columns(1).Width = 80   'Numero
-        MiDataGrid.Columns(2).Width = 140  'TipoPoliza
-        MiDataGrid.Columns(2).HeaderText = "Tipo de póliza"
-        MiDataGrid.Columns(3).Width = 100   'Registros
-        MiDataGrid.Columns(4).Width = 120  'Cargos
-        MiDataGrid.Columns(5).Width = 120   'Abonos
-        MiDataGrid.Columns(6).Width = 100  'Importada
-        MiDataGrid.Columns(4).HeaderText = "Cargos"
-        MiDataGrid.Columns(5).HeaderText = "Abonos"
+        'MiDataGrid.Columns(0).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+        'MiDataGrid.Columns(1).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+        'MiDataGrid.Columns(3).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+        'MiDataGrid.Columns(4).DefaultCellStyle.Format = "N2"
+        ' MiDataGrid.Columns(4).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+        'MiDataGrid.Columns(5).DefaultCellStyle.Format = "N2"
+        'MiDataGrid.Columns(5).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+        'MiDataGrid.Columns(6).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+        'MiDataGrid.Columns(0).Width = 100   'Fecha
+        'MiDataGrid.Columns(1).Width = 80   'Numero
+        'MiDataGrid.Columns(2).Width = 140  'TipoPoliza
+        'MiDataGrid.Columns(2).HeaderText = "Tipo de póliza"
+        'MiDataGrid.Columns(3).Width = 100   'Registros
+        'MiDataGrid.Columns(4).Width = 120  'Cargos
+        'MiDataGrid.Columns(5).Width = 120   'Abonos
+        'MiDataGrid.Columns(6).Width = 100  'Importada
+        'MiDataGrid.Columns(4).HeaderText = "Cargos"
+        'MiDataGrid.Columns(5).HeaderText = "Abonos"
 
         SumarCargosYAbonos()
     End Sub
 
     Private Sub MyAnalizarTablas()
-        If MiDatosCONTPAQiAgrupadosBS Is Nothing OrElse MiDatosSistemaTrabajadoresDT Is Nothing Then
+        If MiDatosCONTPAQiAgrupadosBS Is Nothing OrElse MiDatosTrabajadoresAgrupadosDT Is Nothing Then
             Return
         End If
 
@@ -130,11 +123,15 @@ Public Class FrmAnalizarContabilidad
 
         ' Primero procesar las pólizas de CONTPAQi
         For Each row As DataRow In resultTable.Rows
-            Dim clave As String = $"{row("Fecha").ToString()}-{row("Numero")}-{row("TipoPoliza")}"
+
+            'Dim clave As String = $"{row("Fecha")}-{row("Numero")}-{row("TipoPoliza")}"
+            Dim fechaFormateada As String = CDate(row("Fecha")).ToString("yyyy-MM-dd")
 
             ' Buscar la póliza correspondiente en el sistema de trabajadores
-            Dim filtro As String = $"Fecha = '{row("Fecha").ToString()}' AND Numero = '{row("Numero")}' AND TipoPoliza = '{row("TipoPoliza")}'"
-            Dim rowsEncontradas() As DataRow = MiDatosSistemaTrabajadoresDT.Select(filtro)
+            Dim filtro As String = $"Fecha = '{fechaFormateada}' AND Numero = '{row("Numero")}' AND TipoPoliza = '{row("TipoPoliza")}'"
+            Dim rowsEncontradas() As DataRow = MiDatosTrabajadoresAgrupadosDT.Select(filtro)
+
+            'MsgBox($"Buscando póliza: Fecha={fechaFormateada}, Numero={row("Numero")}, TipoPoliza={row("TipoPoliza")}. Encontradas: {rowsEncontradas.Length}")
 
             If rowsEncontradas.Length > 0 Then
                 ' La póliza existe en ambos sistemas, verificar si coinciden los valores
@@ -156,14 +153,15 @@ Public Class FrmAnalizarContabilidad
         Next
 
         ' Ahora agregar las pólizas que están en el sistema de trabajadores pero no en CONTPAQi
-        For Each rowSistema As DataRow In MiDatosSistemaTrabajadoresDT.Rows
-            Dim filtro As String = $"Fecha = '{rowSistema("Fecha").ToString()}' AND Numero = '{rowSistema("Numero")}' AND TipoPoliza = '{rowSistema("TipoPoliza")}'"
+        For Each rowSistema As DataRow In MiDatosTrabajadoresAgrupadosDT.Rows
+            'Dim filtro As String = $"Fecha = '{rowSistema("Fecha")}' AND Numero = '{rowSistema("Numero")}' AND TipoPoliza = '{rowSistema("TipoPoliza")}'"
+            Dim filtro As String = $"Fecha = #{CDate(rowSistema("Fecha")):MM/dd/yyyy}# AND Numero = '{rowSistema("Numero")}' AND TipoPoliza = '{rowSistema("TipoPoliza")}'"
             Dim rowsEncontradas() As DataRow = resultTable.Select(filtro)
 
             If rowsEncontradas.Length = 0 Then
                 ' Esta póliza está en el sistema de trabajadores pero no en CONTPAQi
                 Dim newRow As DataRow = resultTable.NewRow()
-                newRow("Fecha") = rowSistema("Fecha")
+                newRow("Fecha") = CDate(rowSistema("Fecha"))
                 newRow("Numero") = rowSistema("Numero")
                 newRow("TipoPoliza") = rowSistema("TipoPoliza")
                 newRow("Registros") = rowSistema("Registros")
@@ -203,11 +201,11 @@ Public Class FrmAnalizarContabilidad
             Return
         End If
 
-        Dim filaSeleccionada As DataGridViewRow = MiDataGrid.CurrentRow
-        Dim estado As String = filaSeleccionada.Cells(6).Value?.ToString()
-        Dim fecha As String = filaSeleccionada.Cells(0).Value?.ToString()
-        Dim numero As String = filaSeleccionada.Cells(1).Value?.ToString()
-        Dim tipoPoliza As String = filaSeleccionada.Cells(2).Value?.ToString()
+        'Dim filaSeleccionada = MiDataGrid.CurrentRow
+        Dim estado = MiDataGrid.CurrentRow.Cells(6).Value?.ToString
+        Dim fecha = MiDataGrid.CurrentRow.Cells(0).Value?.ToString
+        Dim numero = MiDataGrid.CurrentRow.Cells(1).Value?.ToString
+        Dim tipoPoliza = MiDataGrid.CurrentRow.Cells(2).Value?.ToString
 
         Select Case estado
             Case "CONTPAQi"
@@ -225,72 +223,220 @@ Public Class FrmAnalizarContabilidad
         End Select
     End Sub
 
+    Private Structure ErroresValidacion
+        Public ErroresEmpleado As Integer
+        Public ErroresTipoPoliza As Integer
+        Public DetallesErrores As List(Of String)
+
+        Public ReadOnly Property TieneErrores As Boolean
+            Get
+                Return ErroresEmpleado > 0 OrElse ErroresTipoPoliza > 0
+            End Get
+        End Property
+    End Structure
+
+    Private Function ValidarRegistrosParaImportar(registros As DataRow()) As ErroresValidacion
+        Dim errores As New ErroresValidacion With {.DetallesErrores = New List(Of String)()}
+        For Each row As DataRow In registros
+            If CInt(row("idEmpleado")) = 0 Then
+                errores.ErroresEmpleado += 1
+                errores.DetallesErrores.Add($"Empleado sin cuenta válida: {row("Cuenta")} - {row("Nombre")}")
+            End If
+            If CInt(row("idTipoPoliza")) = 0 Then
+                errores.ErroresTipoPoliza += 1
+                errores.DetallesErrores.Add($"Tipo de póliza no identificado: {row("TipoPoliza")}")
+            End If
+        Next
+        Return errores
+    End Function
+
     Private Sub ImportarPolizaDeCONTPAQi(fecha As String, numero As String, tipoPoliza As String)
         Try
+            Dim fechaFormateada As String = CDate(fecha).ToString("yyyy-MM-dd")
             ' Obtener los registros desagrupados de CONTPAQi para esta póliza específica
-            Dim registrosParaImportar As New List(Of DataRow)
+            'Dim registrosParaImportar As New List(Of DataRow)
+            Dim errores As New ErroresValidacion With {.DetallesErrores = New List(Of String)()}
 
-            For Each rowView As DataRowView In MiDatosCONTPAQiBS
-                Dim row As DataRow = rowView.Row
-                If row("Fecha").ToString() = fecha AndAlso
-                   row("Numero").ToString() = numero AndAlso
-                   row("TipoPoliza").ToString() = tipoPoliza Then
-                    registrosParaImportar.Add(row)
-                End If
-            Next
+            'For Each rowView As DataRowView In MiDatosCONTPAQiDT.DefaultView
 
-            If registrosParaImportar.Count = 0 Then
+            'Filtra unicamente los registros que coinciden con la fecha, número y tipo de póliza seleccionados
+            Dim registrosParaImportar() As DataRow = MiDatosCONTPAQiDT.Select($"Fecha = #{CDate(fecha):yyyy-MM-dd}# AND Numero = '{numero}' AND TipoPoliza = '{tipoPoliza}'")
+
+            'Siempre habrá registros que importar porque el grid solo muestra pólizas que existen en CONTPAQi, pero por si acaso se valida que el filtro haya arrojado resultados
+            If registrosParaImportar.Length = 0 Then
                 MessageBox.Show("No se encontraron registros para importar.")
                 Return
             End If
 
-            ' Confirmar importación
-            Dim resultado As DialogResult = MessageBox.Show(
-                $"¿Desea importar {registrosParaImportar.Count} registros de la póliza {tipoPoliza} #{numero} del {fecha}?",
-                "Confirmar Importación",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question)
+            'recorre los registros filtrados para ver si existen los idEmpleado y idTipoPoliza
+            'crea un arreglo con los errores encontrados para mostrar al usuario antes de confirmar la importación
+            Dim erroresValidacion = ValidarRegistrosParaImportar(registrosParaImportar)
 
-            If resultado = DialogResult.Yes Then
-                ' Aquí implementarías la lógica de importación a la base de datos
-                ' Por ahora solo mostramos un mensaje
-                MessageBox.Show($"Se importaron {registrosParaImportar.Count} registros exitosamente.")
+            If erroresValidacion.TieneErrores Then
+                Dim mensajeErrores As String = $"Se encontraron {erroresValidacion.ErroresEmpleado} errores de empleados y {erroresValidacion.ErroresTipoPoliza} errores de tipo de póliza." & vbCrLf &
+                                              "Detalles:" & vbCrLf & String.Join(vbCrLf, erroresValidacion.DetallesErrores) & vbCrLf &
+                                              "Necesita corregir el catálogo de Tipo de pólizas y el de Empleados..."
+                MessageBox.Show(mensajeErrores, "Errores de Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                'Return
+            Else
+                If MessageBox.Show($"¿Desea importar {registrosParaImportar.Length } registros de la póliza {tipoPoliza} #{numero} del {fecha}?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+                    ' Aquí implementarías la lógica de importación a la base de datos
+                    ' Por ahora solo mostramos un mensaje
+                    'MessageBox.Show($"Se importaron {registrosParaImportar.Count} registros exitosamente.")
+                    If RealizarImportacion(registrosParaImportar, fechaFormateada) Then
+                        MessageBox.Show($"Se importaron {registrosParaImportar.Length} registros exitosamente.")
 
-                ' Actualizar el estado de la fila
-                MiDataGrid.CurrentRow.Cells(6).Value = "CONCILIADA"
-                ActualizarColoresGrid()
+                        ' Actualizar el estado de la fila
+                        MiDataGrid.CurrentRow.Cells(6).Value = "CONCILIADA"
+                        ActualizarColoresGrid()
+                    End If
+                End If
             End If
+
+
+            'For Each row As DataRow In registrosParaImportar
+            'For Each row As DataRow In MiDatosCONTPAQiDT.Rows
+            'Dim row As DataRow = rowView.Row
+            'If row("Fecha").ToString() = fecha AndAlso row("Numero").ToString() = numero AndAlso row("TipoPoliza").ToString() = tipoPoliza Then
+            'registrosParaImportar.Add(row)
+
+            'If CInt(row("idEmpleado")) = 0 Then
+            'errores.ErroresEmpleado += 1
+            'errores.DetallesErrores.Add($"Empleado sin cuenta válida: {row("Cuenta")} - {row("Nombre")}")
+            'End If
+            'If CInt(row("idTipoPoliza")) = 0 Then
+            'errores.ErroresTipoPoliza += 1
+            'errores.DetallesErrores.Add($"Tipo de póliza no identificado: {row("TipoPoliza")}")
+            'End If
+            'End If
+            'Next
+
+
+
+            'If ErroresValidacion.ti Then
+
+            ' Confirmar importación
+            'Dim resultado As DialogResult = MessageBox.Show(
+            '   $"¿Desea importar {registrosParaImportar.Count} registros de la póliza {tipoPoliza} #{numero} del {fecha}?",
+            '  "Confirmar Importación",
+            'MessageBoxButtons.YesNo,
+            'MessageBoxIcon.Question)
+
+
 
         Catch ex As Exception
             MessageBox.Show($"Error al importar: {ex.Message}")
         End Try
     End Sub
 
+    Private Function RealizarImportacion(registros As DataRow(), fechaFormateada As String) As Boolean
+        Dim sqlConexion As New MySqlConnection("allowuservariables=True; server=localhost; User Id=buzosbyp_erp; password=Mientras12$; database=buzosbyp_erp")
+        Dim sqlComando As MySqlCommand
+        Try
+            sqlConexion.Open()
+            Dim transaction As MySqlTransaction = sqlConexion.BeginTransaction()
+            For Each row As DataRow In registros
+                Dim strSQL As String = "INSERT INTO tbl_cargos (idEmpleado, idTipoPoliza, Fecha, Poliza, Concepto, Rubro, Cargo, Abono) " &
+                                       "VALUES (@idEmpleado, @idTipoPoliza, @Fecha, @Poliza, @Concepto, @Rubro, @Cargo, @Abono)"
+                sqlComando = New MySqlCommand(strSQL, sqlConexion, transaction)
+                sqlComando.Parameters.AddWithValue("@idEmpleado", CInt(row("idEmpleado")))
+                sqlComando.Parameters.AddWithValue("@idTipoPoliza", CInt(row("idTipoPoliza")))
+                sqlComando.Parameters.AddWithValue("@Fecha", fechaFormateada)
+                sqlComando.Parameters.AddWithValue("@Poliza", row("Numero").ToString())
+                sqlComando.Parameters.AddWithValue("@Concepto", row("Concepto").ToString())
+                sqlComando.Parameters.AddWithValue("@Rubro", row("Rubro").ToString())
+                sqlComando.Parameters.AddWithValue("@Cargo", CDbl(row("Cargos")))
+                sqlComando.Parameters.AddWithValue("@Abono", CDbl(row("Abonos")))
+                sqlComando.ExecuteNonQuery()
+            Next
+            transaction.Commit()
+            Return True
+        Catch ex As Exception
+            MessageBox.Show($"Error durante la importación: {ex.Message}")
+            Return False
+        Finally
+            sqlConexion.Close()
+        End Try
+    End Function
+
     Private Sub MostrarInconsistencias(fecha As String, numero As String, tipoPoliza As String)
-        ' Obtener datos de CONTPAQi
-        Dim filaCONTPAQi As DataGridViewRow = MiDataGrid.CurrentRow
-        Dim registrosCONTPAQi As Integer = CInt(filaCONTPAQi.Cells(3).Value)
-        Dim cargosCONTPAQi As Double = CDbl(filaCONTPAQi.Cells(4).Value)
-        Dim abonosCONTPAQi As Double = CDbl(filaCONTPAQi.Cells(5).Value)
+        Try
+            ' Obtener datos de CONTPAQi desde el grid
+            Dim filaCONTPAQi As DataGridViewRow = MiDataGrid.CurrentRow
+            Dim registrosCONTPAQi As Integer = CInt(filaCONTPAQi.Cells(3).Value)
+            Dim cargosCONTPAQi As Double = CDbl(filaCONTPAQi.Cells(4).Value)
+            Dim abonosCONTPAQi As Double = CDbl(filaCONTPAQi.Cells(5).Value)
 
-        ' Obtener datos del sistema de empleados
-        Dim filtro As String = $"Fecha = '{fecha}' AND Numero = '{numero}' AND TipoPoliza = '{tipoPoliza}'"
-        Dim rowsEmpleados() As DataRow = MiDatosSistemaTrabajadoresDT.Select(filtro)
+            ' Obtener datos del sistema de empleados
+            Dim fechaFormateada As String = CDate(fecha).ToString("yyyy-MM-dd")
+            Dim filtro As String = $"Fecha = '{fechaFormateada}' AND Numero = '{numero}' AND TipoPoliza = '{tipoPoliza}'"
+            Dim rowsEmpleados() As DataRow = MiDatosTrabajadoresAgrupadosDT.Select(filtro)
 
-        If rowsEmpleados.Length > 0 Then
-            Dim rowEmpleados As DataRow = rowsEmpleados(0)
+            If rowsEmpleados.Length > 0 Then
+                Dim rowEmpleados As DataRow = rowsEmpleados(0)
 
-            Dim mensaje As String = $"Póliza: {tipoPoliza}, Número: {numero}, Fecha: {fecha}" & vbCrLf & vbCrLf &
-                                  $"CONTPAQi: Registros: {registrosCONTPAQi}, Cargos: {cargosCONTPAQi:N2}, Abonos: {abonosCONTPAQi:N2}" & vbCrLf &
-                                  $"EMPLEADOS: Registros: {rowEmpleados("Registros")}, Cargos: {CDbl(rowEmpleados("SumaCargos")):N2}, Abonos: {CDbl(rowEmpleados("SumaAbonos")):N2}" & vbCrLf & vbCrLf &
-                                  "¿Desea revisar los detalles de esta póliza?"
+                ' Crear el formulario de revisión
+                Dim frmRevisar As New FrmRevisarInconsistencias(
+                CDate(fecha),
+                numero,
+                tipoPoliza,
+                registrosCONTPAQi,
+                cargosCONTPAQi,
+                abonosCONTPAQi,
+                CInt(rowEmpleados("Registros")),
+                CDbl(rowEmpleados("SumaCargos")),
+                CDbl(rowEmpleados("SumaAbonos"))
+            )
 
-            Dim resultado As DialogResult = MessageBox.Show(mensaje, "Inconsistencias Detectadas", MessageBoxButtons.YesNo, MessageBoxIcon.Warning)
+                ' Cargar detalles de CONTPAQi
+                Dim detallesCONTPAQi As New List(Of DataRow)
+                'For Each rowView As DataRowView In MiDatosCONTPAQiBS
+                For Each rowView As DataRowView In MiDatosCONTPAQiDT.DefaultView
+                    Dim row As DataRow = rowView.Row
+                    Dim rowFechaFormateada As String = CDate(row("Fecha")).ToString("yyyy-MM-dd")
+                    If rowFechaFormateada = fechaFormateada AndAlso
+                   row("Numero").ToString() = numero AndAlso
+                   row("TipoPoliza").ToString() = tipoPoliza Then
+                        detallesCONTPAQi.Add(row)
+                    End If
+                Next
+                frmRevisar.CargarDetallesCONTPAQi(detallesCONTPAQi)
 
-            If resultado = DialogResult.Yes Then
-                MessageBox.Show("Aquí se abriría el formulario de revisión detallada (pendiente de implementar).")
+                ' Cargar detalles de Empleados desde la BD
+                CargarDetallesEmpleadosParaRevision(frmRevisar, fechaFormateada, numero, tipoPoliza)
+
+                ' Mostrar el formulario
+                frmRevisar.ShowDialog()
             End If
-        End If
+
+        Catch ex As Exception
+            MessageBox.Show($"Error al mostrar inconsistencias: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    Private Sub CargarDetallesEmpleadosParaRevision(frmRevisar As FrmRevisarInconsistencias, fecha As String, numero As String, tipoPoliza As String)
+        Dim sqlConexion As New MySqlConnection("allowuservariables=True; server=localhost; User Id=buzosbyp_erp; password=Mientras12$; database=buzosbyp_erp")
+
+        Try
+            Dim strSQL As String = $"SELECT e.noCuenta AS Cuenta, CONCAT(e.ApPaterno, ' ', e.ApMaterno, ' ', e.Nombre) AS Nombre, c.Concepto, c.Rubro, c.Cargo, c.Abono
+                                FROM tbl_cargos c
+                                INNER JOIN empleados e ON e.idEmpleado = c.idEmpleado
+                                INNER JOIN ctg_tipopoliza tp ON tp.idTipoPoliza = c.idTipoPoliza
+                                WHERE c.Fecha = '{fecha}' AND c.Poliza = '{numero}' AND tp.TipoPoliza = '{tipoPoliza}'
+                                ORDER BY e.noCuenta"
+
+            sqlConexion.Open()
+            Dim adapter As New MySqlDataAdapter(strSQL, sqlConexion)
+            Dim dt As New DataTable()
+            adapter.Fill(dt)
+
+            frmRevisar.CargarDetallesEmpleados(dt)
+
+        Catch ex As Exception
+            MessageBox.Show($"Error al cargar detalles de empleados: {ex.Message}")
+        Finally
+            sqlConexion.Close()
+        End Try
     End Sub
 
     Private Sub SumarCargosYAbonos()
@@ -306,5 +452,33 @@ Public Class FrmAnalizarContabilidad
 
         TxtCargos.Text = totalCargos.ToString("N2")
         TxtAbonos.Text = totalAbonos.ToString("N2")
+    End Sub
+
+    Private Sub BtnRevisar_Click(sender As Object, e As EventArgs) Handles BtnRevisar.Click
+        If MiDataGrid.CurrentRow Is Nothing Then
+            MessageBox.Show("Seleccione una fila para procesar.")
+            Return
+        End If
+
+        'Dim filaSeleccionada = MiDataGrid.CurrentRow
+        'Dim estado = MiDataGrid.CurrentRow.Cells(6).Value?.ToString
+        Dim fecha = MiDataGrid.CurrentRow.Cells(0).Value?.ToString
+        Dim numero = MiDataGrid.CurrentRow.Cells(1).Value?.ToString
+        Dim tipoPoliza = MiDataGrid.CurrentRow.Cells(2).Value?.ToString
+
+        'Select Case estado
+        'Case "CONTPAQi"
+        'ImportarPolizaDeCONTPAQi(fecha, numero, tipoPoliza)
+
+        'Case "CONCILIADA"
+        'MessageBox.Show($"La póliza {tipoPoliza} #{numero} del {fecha} ya existe en ambos sistemas y está conciliada.")
+
+        'Case "REVISAR"
+        MostrarInconsistencias(fecha, numero, tipoPoliza)
+
+        'Case "EMPLEADOS"
+        'MessageBox.Show($"La póliza {tipoPoliza} #{numero} del {fecha} existe solo en el sistema de empleados." & vbCrLf &
+        '                 "Esta póliza debe ser revisada y posiblemente eliminada del sistema de empleados.")
+        'End Select
     End Sub
 End Class

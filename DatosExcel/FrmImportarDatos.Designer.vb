@@ -24,50 +24,10 @@ Partial Class FrmImportarDatos
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
         Dim DataGridViewCellStyle1 As DataGridViewCellStyle = New DataGridViewCellStyle()
+        Dim DataGridViewCellStyle2 As DataGridViewCellStyle = New DataGridViewCellStyle()
+        Dim DataGridViewCellStyle3 As DataGridViewCellStyle = New DataGridViewCellStyle()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(FrmImportarDatos))
         MiDataGrid = New DataGridView()
-        ContextMenuStrip1 = New ContextMenuStrip(components)
-        BtnCopiar = New ToolStripMenuItem()
-        ToolStrip1 = New ToolStrip()
-        BtnAbrirArchivo = New ToolStripButton()
-        ToolStripSeparator2 = New ToolStripSeparator()
-        BtnAnalizar = New ToolStripButton()
-        BtnAyuda = New ToolStripButton()
-        ToolStripSeparator6 = New ToolStripSeparator()
-        BtnConciliar = New ToolStripButton()
-        OpenFileDialog1 = New OpenFileDialog()
-        TableLayoutPanel1 = New TableLayoutPanel()
-        Panel1 = New Panel()
-        LblErrores = New Label()
-        Label2 = New Label()
-        TxtNombreArchivo = New TextBox()
-        TxtBuscar = New TextBox()
-        Label1 = New Label()
-        LblArchivoCargado = New Label()
-        ToolStrip2 = New ToolStrip()
-        BtnPrimero = New ToolStripButton()
-        BtnAnterior = New ToolStripButton()
-        ToolStripSeparator5 = New ToolStripSeparator()
-        TxtRegistro = New ToolStripTextBox()
-        TxtTotalRegistros = New ToolStripLabel()
-        ToolStripSeparator4 = New ToolStripSeparator()
-        BtnSiguiente = New ToolStripButton()
-        BtnUltimo = New ToolStripButton()
-        ToolStripSeparator1 = New ToolStripSeparator()
-        BtnActualizar = New ToolStripButton()
-        ToolStripSeparator3 = New ToolStripSeparator()
-        MyProgressBar1 = New ToolStripProgressBar()
-        LblProgreso = New ToolStripLabel()
-        BtnAceptar = New ToolStripButton()
-        LblAbonos = New ToolStripTextBox()
-        LblCargos = New ToolStripTextBox()
-        ToolStripLabel2 = New ToolStripLabel()
-        LblSeleccion = New ToolStripTextBox()
-        ToolStripLabel1 = New ToolStripLabel()
-        Panel2 = New Panel()
-        TxtCargos = New TextBox()
-        TxtAbonos = New TextBox()
-        BackgroundWorker1 = New ComponentModel.BackgroundWorker()
         Cuenta = New DataGridViewTextBoxColumn()
         TipoTrabajador = New DataGridViewTextBoxColumn()
         Nombre = New DataGridViewTextBoxColumn()
@@ -81,6 +41,33 @@ Partial Class FrmImportarDatos
         idEmpleado = New DataGridViewTextBoxColumn()
         idTipoPoliza = New DataGridViewTextBoxColumn()
         ClaveRubro = New DataGridViewTextBoxColumn()
+        ContextMenuStrip1 = New ContextMenuStrip(components)
+        BtnCopiar = New ToolStripMenuItem()
+        ToolStrip1 = New ToolStrip()
+        BtnAbrirArchivo = New ToolStripButton()
+        ToolStripSeparator2 = New ToolStripSeparator()
+        BtnAnalizar = New ToolStripButton()
+        BtnAyuda = New ToolStripButton()
+        ToolStripSeparator6 = New ToolStripSeparator()
+        BtnConciliar = New ToolStripButton()
+        OpenFileDialog1 = New OpenFileDialog()
+        TableLayoutPanel1 = New TableLayoutPanel()
+        Panel1 = New Panel()
+        TxtNombreArchivo = New TextBox()
+        LblArchivoCargado = New Label()
+        ToolStrip2 = New ToolStrip()
+        MyProgressBar1 = New ToolStripProgressBar()
+        LblProgreso = New ToolStripLabel()
+        BtnAceptar = New ToolStripButton()
+        LblAbonos = New ToolStripTextBox()
+        LblCargos = New ToolStripTextBox()
+        ToolStripLabel2 = New ToolStripLabel()
+        LblSeleccion = New ToolStripTextBox()
+        ToolStripLabel1 = New ToolStripLabel()
+        Panel2 = New Panel()
+        TxtCargos = New TextBox()
+        TxtAbonos = New TextBox()
+        BackgroundWorker1 = New ComponentModel.BackgroundWorker()
         CType(MiDataGrid, ComponentModel.ISupportInitialize).BeginInit()
         ContextMenuStrip1.SuspendLayout()
         ToolStrip1.SuspendLayout()
@@ -104,13 +91,119 @@ Partial Class FrmImportarDatos
         MiDataGrid.ContextMenuStrip = ContextMenuStrip1
         MiDataGrid.Dock = DockStyle.Fill
         MiDataGrid.EditMode = DataGridViewEditMode.EditOnEnter
-        MiDataGrid.Location = New Point(3, 124)
+        MiDataGrid.Location = New Point(3, 99)
         MiDataGrid.Name = "MiDataGrid"
         MiDataGrid.ReadOnly = True
         MiDataGrid.RowHeadersWidth = 25
         MiDataGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect
-        MiDataGrid.Size = New Size(1200, 383)
+        MiDataGrid.Size = New Size(1200, 408)
         MiDataGrid.TabIndex = 1
+        ' 
+        ' Cuenta
+        ' 
+        Cuenta.DataPropertyName = "Cuenta"
+        Cuenta.HeaderText = "Cuenta"
+        Cuenta.Name = "Cuenta"
+        Cuenta.ReadOnly = True
+        Cuenta.Width = 50
+        ' 
+        ' TipoTrabajador
+        ' 
+        TipoTrabajador.DataPropertyName = "TipoTrabajador"
+        TipoTrabajador.HeaderText = "Tipo de trabajador"
+        TipoTrabajador.Name = "TipoTrabajador"
+        TipoTrabajador.ReadOnly = True
+        TipoTrabajador.Width = 80
+        ' 
+        ' Nombre
+        ' 
+        Nombre.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        Nombre.DataPropertyName = "Nombre"
+        Nombre.HeaderText = "Nombre"
+        Nombre.Name = "Nombre"
+        Nombre.ReadOnly = True
+        ' 
+        ' Fecha
+        ' 
+        Fecha.DataPropertyName = "Fecha"
+        Fecha.HeaderText = "Fecha"
+        Fecha.Name = "Fecha"
+        Fecha.ReadOnly = True
+        Fecha.Width = 80
+        ' 
+        ' TipoPoliza
+        ' 
+        TipoPoliza.DataPropertyName = "TipoPoliza"
+        TipoPoliza.HeaderText = "Tipo de póliza"
+        TipoPoliza.Name = "TipoPoliza"
+        TipoPoliza.ReadOnly = True
+        ' 
+        ' Numero
+        ' 
+        Numero.DataPropertyName = "Numero"
+        Numero.HeaderText = "Número de póliza"
+        Numero.Name = "Numero"
+        Numero.ReadOnly = True
+        Numero.Width = 60
+        ' 
+        ' Concepto
+        ' 
+        Concepto.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        Concepto.DataPropertyName = "Concepto"
+        Concepto.HeaderText = "Concepto"
+        Concepto.Name = "Concepto"
+        Concepto.ReadOnly = True
+        ' 
+        ' Referencia
+        ' 
+        Referencia.DataPropertyName = "Referencia"
+        Referencia.HeaderText = "Referencia"
+        Referencia.Name = "Referencia"
+        Referencia.ReadOnly = True
+        ' 
+        ' Cargos
+        ' 
+        Cargos.DataPropertyName = "Cargos"
+        DataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleRight
+        DataGridViewCellStyle2.Format = "N2"
+        Cargos.DefaultCellStyle = DataGridViewCellStyle2
+        Cargos.HeaderText = "Cargos"
+        Cargos.Name = "Cargos"
+        Cargos.ReadOnly = True
+        ' 
+        ' Abonos
+        ' 
+        Abonos.DataPropertyName = "Abonos"
+        DataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleRight
+        DataGridViewCellStyle3.Format = "N2"
+        Abonos.DefaultCellStyle = DataGridViewCellStyle3
+        Abonos.HeaderText = "Abonos"
+        Abonos.Name = "Abonos"
+        Abonos.ReadOnly = True
+        ' 
+        ' idEmpleado
+        ' 
+        idEmpleado.DataPropertyName = "idEmpleado"
+        idEmpleado.HeaderText = "idEmpleado"
+        idEmpleado.Name = "idEmpleado"
+        idEmpleado.ReadOnly = True
+        idEmpleado.Visible = False
+        ' 
+        ' idTipoPoliza
+        ' 
+        idTipoPoliza.DataPropertyName = "idTipoPoliza"
+        idTipoPoliza.HeaderText = "idTipoPoliza"
+        idTipoPoliza.Name = "idTipoPoliza"
+        idTipoPoliza.ReadOnly = True
+        idTipoPoliza.Visible = False
+        ' 
+        ' ClaveRubro
+        ' 
+        ClaveRubro.DataPropertyName = "ClaveRubro"
+        ClaveRubro.HeaderText = "ClaveRubro"
+        ClaveRubro.Name = "ClaveRubro"
+        ClaveRubro.ReadOnly = True
+        ClaveRubro.Visible = False
         ' 
         ' ContextMenuStrip1
         ' 
@@ -207,7 +300,7 @@ Partial Class FrmImportarDatos
         TableLayoutPanel1.Name = "TableLayoutPanel1"
         TableLayoutPanel1.RowCount = 5
         TableLayoutPanel1.RowStyles.Add(New RowStyle(SizeType.Absolute, 55F))
-        TableLayoutPanel1.RowStyles.Add(New RowStyle(SizeType.Absolute, 66F))
+        TableLayoutPanel1.RowStyles.Add(New RowStyle(SizeType.Absolute, 41F))
         TableLayoutPanel1.RowStyles.Add(New RowStyle(SizeType.Percent, 100F))
         TableLayoutPanel1.RowStyles.Add(New RowStyle(SizeType.Absolute, 36F))
         TableLayoutPanel1.RowStyles.Add(New RowStyle(SizeType.Absolute, 67F))
@@ -216,39 +309,13 @@ Partial Class FrmImportarDatos
         ' 
         ' Panel1
         ' 
-        Panel1.Controls.Add(LblErrores)
-        Panel1.Controls.Add(Label2)
         Panel1.Controls.Add(TxtNombreArchivo)
-        Panel1.Controls.Add(TxtBuscar)
-        Panel1.Controls.Add(Label1)
         Panel1.Controls.Add(LblArchivoCargado)
         Panel1.Dock = DockStyle.Fill
         Panel1.Location = New Point(3, 58)
         Panel1.Name = "Panel1"
-        Panel1.Size = New Size(1200, 60)
+        Panel1.Size = New Size(1200, 35)
         Panel1.TabIndex = 4
-        ' 
-        ' LblErrores
-        ' 
-        LblErrores.AutoSize = True
-        LblErrores.Font = New Font("Segoe UI", 13F, FontStyle.Bold)
-        LblErrores.ForeColor = Color.Red
-        LblErrores.Location = New Point(1077, 18)
-        LblErrores.Name = "LblErrores"
-        LblErrores.Size = New Size(22, 25)
-        LblErrores.TabIndex = 5
-        LblErrores.Text = "0"
-        ' 
-        ' Label2
-        ' 
-        Label2.AutoSize = True
-        Label2.Font = New Font("Segoe UI", 13F)
-        Label2.ForeColor = Color.FromArgb(CByte(192), CByte(0), CByte(0))
-        Label2.Location = New Point(1000, 18)
-        Label2.Name = "Label2"
-        Label2.Size = New Size(71, 25)
-        Label2.TabIndex = 4
-        Label2.Text = "Errores:"
         ' 
         ' TxtNombreArchivo
         ' 
@@ -257,22 +324,6 @@ Partial Class FrmImportarDatos
         TxtNombreArchivo.Name = "TxtNombreArchivo"
         TxtNombreArchivo.Size = New Size(651, 23)
         TxtNombreArchivo.TabIndex = 3
-        ' 
-        ' TxtBuscar
-        ' 
-        TxtBuscar.Location = New Point(60, 34)
-        TxtBuscar.Name = "TxtBuscar"
-        TxtBuscar.Size = New Size(414, 23)
-        TxtBuscar.TabIndex = 2
-        ' 
-        ' Label1
-        ' 
-        Label1.AutoSize = True
-        Label1.Location = New Point(9, 37)
-        Label1.Name = "Label1"
-        Label1.Size = New Size(45, 15)
-        Label1.TabIndex = 1
-        Label1.Text = "Buscar:"
         ' 
         ' LblArchivoCargado
         ' 
@@ -286,96 +337,12 @@ Partial Class FrmImportarDatos
         ' ToolStrip2
         ' 
         ToolStrip2.Dock = DockStyle.Fill
-        ToolStrip2.Items.AddRange(New ToolStripItem() {BtnPrimero, BtnAnterior, ToolStripSeparator5, TxtRegistro, TxtTotalRegistros, ToolStripSeparator4, BtnSiguiente, BtnUltimo, ToolStripSeparator1, BtnActualizar, ToolStripSeparator3, MyProgressBar1, LblProgreso, BtnAceptar, LblAbonos, LblCargos, ToolStripLabel2, LblSeleccion, ToolStripLabel1})
+        ToolStrip2.Items.AddRange(New ToolStripItem() {MyProgressBar1, LblProgreso, BtnAceptar, LblAbonos, LblCargos, ToolStripLabel2, LblSeleccion, ToolStripLabel1})
         ToolStrip2.Location = New Point(0, 546)
         ToolStrip2.Name = "ToolStrip2"
         ToolStrip2.Size = New Size(1206, 67)
         ToolStrip2.TabIndex = 3
         ToolStrip2.Text = "ToolStrip2"
-        ' 
-        ' BtnPrimero
-        ' 
-        BtnPrimero.Image = CType(resources.GetObject("BtnPrimero.Image"), Image)
-        BtnPrimero.ImageScaling = ToolStripItemImageScaling.None
-        BtnPrimero.ImageTransparentColor = Color.Magenta
-        BtnPrimero.Name = "BtnPrimero"
-        BtnPrimero.Size = New Size(53, 64)
-        BtnPrimero.Text = "Primero"
-        BtnPrimero.TextImageRelation = TextImageRelation.ImageAboveText
-        ' 
-        ' BtnAnterior
-        ' 
-        BtnAnterior.Image = CType(resources.GetObject("BtnAnterior.Image"), Image)
-        BtnAnterior.ImageScaling = ToolStripItemImageScaling.None
-        BtnAnterior.ImageTransparentColor = Color.Magenta
-        BtnAnterior.Name = "BtnAnterior"
-        BtnAnterior.Size = New Size(54, 64)
-        BtnAnterior.Text = "Anterior"
-        BtnAnterior.TextImageRelation = TextImageRelation.ImageAboveText
-        ' 
-        ' ToolStripSeparator5
-        ' 
-        ToolStripSeparator5.Name = "ToolStripSeparator5"
-        ToolStripSeparator5.Size = New Size(6, 67)
-        ' 
-        ' TxtRegistro
-        ' 
-        TxtRegistro.Enabled = False
-        TxtRegistro.Name = "TxtRegistro"
-        TxtRegistro.Size = New Size(50, 67)
-        TxtRegistro.TextBoxTextAlign = HorizontalAlignment.Center
-        ' 
-        ' TxtTotalRegistros
-        ' 
-        TxtTotalRegistros.Name = "TxtTotalRegistros"
-        TxtTotalRegistros.Size = New Size(29, 64)
-        TxtTotalRegistros.Text = "de 0"
-        ' 
-        ' ToolStripSeparator4
-        ' 
-        ToolStripSeparator4.Name = "ToolStripSeparator4"
-        ToolStripSeparator4.Size = New Size(6, 67)
-        ' 
-        ' BtnSiguiente
-        ' 
-        BtnSiguiente.Image = CType(resources.GetObject("BtnSiguiente.Image"), Image)
-        BtnSiguiente.ImageScaling = ToolStripItemImageScaling.None
-        BtnSiguiente.ImageTransparentColor = Color.Magenta
-        BtnSiguiente.Name = "BtnSiguiente"
-        BtnSiguiente.Size = New Size(60, 64)
-        BtnSiguiente.Text = "Siguiente"
-        BtnSiguiente.TextImageRelation = TextImageRelation.ImageAboveText
-        ' 
-        ' BtnUltimo
-        ' 
-        BtnUltimo.AutoSize = False
-        BtnUltimo.Image = CType(resources.GetObject("BtnUltimo.Image"), Image)
-        BtnUltimo.ImageScaling = ToolStripItemImageScaling.None
-        BtnUltimo.ImageTransparentColor = Color.Magenta
-        BtnUltimo.Name = "BtnUltimo"
-        BtnUltimo.Size = New Size(60, 51)
-        BtnUltimo.Text = "Ultimo"
-        BtnUltimo.TextImageRelation = TextImageRelation.ImageAboveText
-        ' 
-        ' ToolStripSeparator1
-        ' 
-        ToolStripSeparator1.Name = "ToolStripSeparator1"
-        ToolStripSeparator1.Size = New Size(6, 67)
-        ' 
-        ' BtnActualizar
-        ' 
-        BtnActualizar.Image = CType(resources.GetObject("BtnActualizar.Image"), Image)
-        BtnActualizar.ImageScaling = ToolStripItemImageScaling.None
-        BtnActualizar.ImageTransparentColor = Color.Magenta
-        BtnActualizar.Name = "BtnActualizar"
-        BtnActualizar.Size = New Size(63, 64)
-        BtnActualizar.Text = "Actualizar"
-        BtnActualizar.TextImageRelation = TextImageRelation.ImageAboveText
-        ' 
-        ' ToolStripSeparator3
-        ' 
-        ToolStripSeparator3.Name = "ToolStripSeparator3"
-        ToolStripSeparator3.Size = New Size(6, 67)
         ' 
         ' MyProgressBar1
         ' 
@@ -469,93 +436,6 @@ Partial Class FrmImportarDatos
         ' 
         BackgroundWorker1.WorkerReportsProgress = True
         ' 
-        ' Cuenta
-        ' 
-        Cuenta.HeaderText = "Cuenta"
-        Cuenta.Name = "Cuenta"
-        Cuenta.ReadOnly = True
-        Cuenta.Width = 50
-        ' 
-        ' TipoTrabajador
-        ' 
-        TipoTrabajador.HeaderText = "Tipo de trabajador"
-        TipoTrabajador.Name = "TipoTrabajador"
-        TipoTrabajador.ReadOnly = True
-        TipoTrabajador.Width = 80
-        ' 
-        ' Nombre
-        ' 
-        Nombre.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-        Nombre.HeaderText = "Nombre"
-        Nombre.Name = "Nombre"
-        Nombre.ReadOnly = True
-        ' 
-        ' Fecha
-        ' 
-        Fecha.HeaderText = "Fecha"
-        Fecha.Name = "Fecha"
-        Fecha.ReadOnly = True
-        Fecha.Width = 80
-        ' 
-        ' TipoPoliza
-        ' 
-        TipoPoliza.HeaderText = "Tipo de póliza"
-        TipoPoliza.Name = "TipoPoliza"
-        TipoPoliza.ReadOnly = True
-        ' 
-        ' Numero
-        ' 
-        Numero.HeaderText = "Número de póliza"
-        Numero.Name = "Numero"
-        Numero.ReadOnly = True
-        Numero.Width = 60
-        ' 
-        ' Concepto
-        ' 
-        Concepto.HeaderText = "Concepto"
-        Concepto.Name = "Concepto"
-        Concepto.ReadOnly = True
-        Concepto.Width = 250
-        ' 
-        ' Referencia
-        ' 
-        Referencia.HeaderText = "Referencia"
-        Referencia.Name = "Referencia"
-        Referencia.ReadOnly = True
-        ' 
-        ' Cargos
-        ' 
-        Cargos.HeaderText = "Cargos"
-        Cargos.Name = "Cargos"
-        Cargos.ReadOnly = True
-        ' 
-        ' Abonos
-        ' 
-        Abonos.HeaderText = "Abonos"
-        Abonos.Name = "Abonos"
-        Abonos.ReadOnly = True
-        ' 
-        ' idEmpleado
-        ' 
-        idEmpleado.HeaderText = "idEmpleado"
-        idEmpleado.Name = "idEmpleado"
-        idEmpleado.ReadOnly = True
-        idEmpleado.Visible = False
-        ' 
-        ' idTipoPoliza
-        ' 
-        idTipoPoliza.HeaderText = "idTipoPoliza"
-        idTipoPoliza.Name = "idTipoPoliza"
-        idTipoPoliza.ReadOnly = True
-        idTipoPoliza.Visible = False
-        ' 
-        ' ClaveRubro
-        ' 
-        ClaveRubro.HeaderText = "ClaveRubro"
-        ClaveRubro.Name = "ClaveRubro"
-        ClaveRubro.ReadOnly = True
-        ClaveRubro.Visible = False
-        ' 
         ' FrmImportarDatos
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
@@ -585,12 +465,6 @@ Partial Class FrmImportarDatos
     Friend WithEvents OpenFileDialog1 As OpenFileDialog
     Friend WithEvents TableLayoutPanel1 As TableLayoutPanel
     Friend WithEvents ToolStrip2 As ToolStrip
-    Friend WithEvents BtnPrimero As ToolStripButton
-    Friend WithEvents BtnAnterior As ToolStripButton
-    Friend WithEvents TxtRegistro As ToolStripTextBox
-    Friend WithEvents BtnSiguiente As ToolStripButton
-    Friend WithEvents BtnUltimo As ToolStripButton
-    Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
     Friend WithEvents MyProgressBar1 As ToolStripProgressBar
     Friend WithEvents LblProgreso As ToolStripLabel
     Friend WithEvents BackgroundWorker1 As System.ComponentModel.BackgroundWorker
@@ -600,14 +474,7 @@ Partial Class FrmImportarDatos
     Friend WithEvents BtnAceptar As ToolStripButton
     Friend WithEvents Panel1 As Panel
     Friend WithEvents LblArchivoCargado As Label
-    Friend WithEvents BtnActualizar As ToolStripButton
-    Friend WithEvents ToolStripSeparator3 As ToolStripSeparator
-    Friend WithEvents ToolStripSeparator5 As ToolStripSeparator
-    Friend WithEvents TxtTotalRegistros As ToolStripLabel
-    Friend WithEvents ToolStripSeparator4 As ToolStripSeparator
     Friend WithEvents TxtNombreArchivo As TextBox
-    Friend WithEvents TxtBuscar As TextBox
-    Friend WithEvents Label1 As Label
     Friend WithEvents Panel2 As Panel
     Friend WithEvents TxtCargos As TextBox
     Friend WithEvents TxtAbonos As TextBox
@@ -618,8 +485,6 @@ Partial Class FrmImportarDatos
     Friend WithEvents ContextMenuStrip1 As ContextMenuStrip
     Friend WithEvents BtnCopiar As ToolStripMenuItem
     Friend WithEvents ToolStripLabel2 As ToolStripLabel
-    Friend WithEvents LblErrores As Label
-    Friend WithEvents Label2 As Label
     Friend WithEvents ToolStripSeparator6 As ToolStripSeparator
     Friend WithEvents BtnConciliar As ToolStripButton
     Friend WithEvents Cuenta As DataGridViewTextBoxColumn
